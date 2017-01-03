@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <!-- 先引入 Vue -->
+  <script src="https://unpkg.com/vue/dist/vue.js"></script>
+  <!-- 引入组件库 -->
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <script src="https://cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script>
+  <!-- 引入样式 -->
+  <link href="https://unpkg.com/element-ui/lib/theme-default/index.css" rel="stylesheet" type="text/css">
+
+</head>
+<style type="text/css">
+  body {
+    background: url("/img/bg.jpg") fixed center center no-repeat;
+    background-size: cover;
+    width: 100%;
+}
+    html{
+      overflow-x: hidden;
+    }
+</style>
+<body>
+<div id="app" style="font-family:'Microsoft YaHei UI'">
+<br />
+<el-row>
+  <el-col :span="8" :offset="6" style="font-size:20px">欢迎注册</el-col>
+  <el-col :span="8" style="font-size:18px">已有账户？<a href="/BookExchange/index.html" style="color:#FF4949">登录</a></el-col>
+</el-row>
+<br>
+<br>
+<el-row>
+     <el-col :span="3" :offset="6" style="font-size:18px; margin-top:6px">昵称  ：</el-col>
+    <el-col :span="4"><el-input placeholder="请输入你的昵称" v-model="username"></el-input></el-col>
+    <el-col :span="3"><el-tag :type="message?'success':'danger'" :style=" {visibility: username==''?'hidden':'visible' }" style="height:35px; line-height:35px; font-size:18px ; margin-left:2px"><i :class="message?'el-icon-circle-check':'el-icon-circle-cross'"></i>{{message?'':'此用户名已被注册'}}</el-tag></el-col>
+    </el-row>
+<br>
+<br>
+<el-row>
+  <el-col :span="3" :offset="6" style="font-size:18px; margin-top:6px">性别  ：</el-col>
+    <el-col :span="4"><template>
+  <el-radio class="radio" v-model="radio" label="1">男</el-radio>
+  <el-radio class="radio" v-model="radio" label="2">女</el-radio>
+</template></el-col>
+    </el-row>
+    <br>
+    <br>
+ <el-row>
+  <el-col :span="3" :offset="6" style="font-size:18px; margin-top:6px">手机号码  ：</el-col>
+    <el-col :span="4"><el-input placeholder="请输入你的你的手机号码" v-model="phone":disabled="phoneMessage?false:true" maxlength="11" onclick="recover()" id="telephone"></el-input>
+  </el-col>
+    <el-col :span="3" ><el-button type="primary" v-bind:disabled="dis" @click="getCode" >{{btnMessage}}</el-button></el-col>
+    </el-row>
+    <el-row>
+    <el-col :span="4" offset="9"><el-tag type="danger" :style="{visibility:phoneCheck?'visible':'hidden'}" style="height:35px; line-height:35px; font-size:18px ;margin:0px;"  ><i class="el-icon-circle-cross"></i>手机号码不符合规范</el-tag></el-col>
+    </el-row>
+<el-row>
+    <el-col :span="4" offset="9"><el-input placeholder="请输入你收到的验证码" v-model="makesure" style="margin-top: 4px"  maxlength="4" onkeydown="onlyNum();"></el-input></el-col>
+    </el-row>
+    <br>
+<br>
+<el-row>
+  <el-col :span="3" :offset="6" style="font-size:18px; margin-top:6px">电子邮箱  ：</el-col>
+    <el-col :span="4"><el-input placeholder="请输入你的电子邮箱" v-model="email" ></el-input></el-col>
+         <el-col :span="3"><el-tag :type="emailMessage?'success':'danger'" :style=" {visibility: email==''?'hidden':'visible' }" style="height:35px; line-height:35px; font-size:18px ; margin-left:2px"><i :class="emailMessage?'el-icon-circle-check':'el-icon-circle-cross'"></i>{{emailMessage?'':'邮箱格式不正确'}}</el-tag></el-col>
+    </el-row>
+    <br>
+<br>
+<el-row>
+  <el-col :span="3" :offset="6" style="font-size:18px; margin-top:6px">密码  ：</el-col>
+    <el-col :span="4"><el-input type="password"id="pwd"placeholder="请输入你的密码" v-model="password"></el-input></el-col>
+    </el-row>
+    <br>
+<br>
+<el-row>
+     <el-col :span="3" :offset="6" style="font-size:18px; margin-top:6px">确认密码  ：</el-col>
+    <el-col :span="4"><el-input type="password" placeholder="请确认你的密码" v-model="password2"></el-input></el-col>
+    <el-col :span="3"><el-tag :type="password==password2?'success':'danger'" :style=" {visibility: password==''?'hidden':'visible' }" style="height:35px; line-height:35px; font-size:18px ; margin-left:2px"><i :class="password==password2?'el-icon-circle-check':'el-icon-circle-cross'"></i>{{password==password2?'':'两次输入的密码不匹配'}}</el-tag></el-col>
+
+    </el-row>
+    <br>
+    <br>
+    <el-row>
+    <el-col :span="3" :offset="10" ><el-button onclick="reg()" type="primary" v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="数据加载中..." :disabled=!(username!=''&&message&&password!=''&&password==password2&&registerPhoneC&&makesure!='')>&nbsp;&nbsp;&nbsp;点击注册&nbsp;&nbsp;&nbsp;</el-button></el-col>
+        </el-row>
+        </div>
+
+
+
+
+</body>
+
+  <script >
+
+  var nameData,count=61;
+  var t;
+  var code;
+  var phoneNumber;
+
+  var vm= new Vue({
+    el:'#app',
+     data: {
+             radio: '1',
+             value2: '',
+             username:'',
+             password:'',
+             password2:'',
+             email:'',
+             makesure:'',
+             phoneCheck:false,
+             registerPhoneC:false,
+             judge:'false',
+             message:'',
+             btnMessage:'点击获取验证码',
+             phoneMessage:true,
+             dis:false,
+             phone:'',
+             emailMessage:false,
+             fullscreenLoading:false,
+
+  /* options2: [{
+          value: '选项1',
+          label: '@163.com'
+        }, {
+          value: '选项2',
+          label: '@126.com',
+        }, {
+          value: '选项3',
+          label: '@qq.com'
+        },]*/
+
+        },
+      watch:{
+          username:function(val,oldVal){
+                var i=0,sign=0;
+                for(i=0;i<nameData.length;i++){
+                  if(nameData[i]["username"]==val){
+                      this.message=false;
+                      sign=1;
+                  }
+                }
+                if(sign==0){
+                      this.message=true;
+                }
+          },
+            email:function(val,oldVal){
+             var myreg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/
+             if(!myreg.test(this.email))
+              {
+                   this.emailMessage=false;
+                   //myreg.focus();
+                  //return false;
+             }else{
+              this.emailMessage=true;
+             }
+          },
+      },
+      methods:{
+          getCode:function(){
+            code=parseInt(Math.random()*(9999-1000+1)+1000);
+      if(checkMobile(this.phone)){
+            this.phoneCheck=false;
+            this.registerPhoneC=true;
+            phoneNumber=this.phone;
+           var url="http://106.ihuyi.com/webservice/sms.php?method=Submit&account=cf_mezereon&password=25f9e794323b453885f5181f1b624d0b&mobile="+this.phone+"&content=您的验证码是："+code+"。请不要把验证码泄露给其他人。"
+            this.$http.get(url)
+              .then((response) => {
+                  alert(response.data);
+              });
+            count--;
+            this.btnMessage=count+'秒后重新获取';
+            this.dis=true;
+            this.phoneMessage=false;
+            circle();
+
+      }else{
+        this.phoneCheck=true;
+        this.registerPhoneC=false;
+      }
+
+        }
+    }
+    })
+    fullscreenLoading=true;
+    var url="http://xplovesaber.top/bookEx/getAllUser.php";
+            vm.$http.get(url)
+              .then((response) => {
+                    nameData=eval(response.data);
+                    fullscreenLoading=false;
+              });
+
+   function circle(){
+            t=setTimeout("circle()",1000);
+            count--;
+            vm.btnMessage=count+'秒后重新获取';
+            vm.dis=true;
+            if(count==0){
+              vm.phoneMessage=true;
+              vm.dis=false;
+              vm.btnMessage='点击获取验证码';
+              count=61;
+              clearTimeout(t);
+
+            }
+          }
+  function  checkMobile(str) {
+    var re =/^(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/
+      return re.test(str);
+  }
+  /*function mailTest(){
+    alert("hi");
+              //对电子邮件的验证
+           var myreg = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/
+             if(!myreg.test(vm.email))
+              {
+                   vm.emailMessage=false;
+                   //myreg.focus();
+                  //return false;
+             }else{
+              vm.emailMessage=true;
+             }
+  }*/
+function recover(){
+  if(vm.phoneCheck==true){
+    vm.phone=null;
+    vm.phoneCheck=false;
+  }
+}
+function reg(){
+        if(vm.makesure==code){
+            vm.fullscreenLoading = true;
+            if(vm.radio==1){
+                var url="http://xplovesaber.top/bookEx/register.php?username="+vm.username+"&password="+vm.password
+                                                        +"&email="+vm.email+"&phone="+vm.phone+"&sex=男";
+            }else{
+                var url="http://xplovesaber.top/bookEx/register.php?username="+vm.username+"&password="+vm.password
+                                                        +"&email="+vm.email+"&phone="+vm.phone+"&sex=女"
+            }
+            vm.$http.get(url)
+            .then((response) => {
+                vm.fullscreenLoading = false;
+                    app.currentView='check';
+                    vm.$notify({
+                                title: '成功',
+                                message: '添加成功',
+                                type: 'success'
+                                });
+                   window.location.href="/BookExchange/register-ok.html";
+            })
+
+        }else{
+            vm.$message.error('验证码输入错误！');
+        }
+    }
+  </script>
+
+</html>

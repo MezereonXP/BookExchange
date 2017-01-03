@@ -1,0 +1,1260 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<!-- 引入样式 -->
+	<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-default/index.css">
+	<link rel='stylesheet' href='/BookExchange/css/style.css' media='screen' />
+
+	<!-- 引入组件库 -->
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+	<script src="https://cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script>
+	<script src="/BookExchange/js/jquery.min.js"></script>
+	<script src="/BookExchange/js/blocksit.min.js"></script>
+
+
+	<style type="text/css">
+		body {
+			background: fixed center center no-repeat;
+			background-size: cover;
+			width: 100%;
+		}
+
+		html {
+			overflow-x: hidden;
+		}
+
+		.content {
+			width: 100%;
+			height: 100%;
+			margin: 10px auto;
+		}
+
+		@media screen and (min-width: 980px)
+		/* Desktop */
+
+		{
+			.content {
+				width: 70%;
+			}
+		}
+
+		.mygallery {
+			margin: 25px 0;
+		}
+	</style>
+	<title>BookExchange</title>
+</head>
+
+<body style="font-family:Microsoft YaHei;">
+
+	<div id='app'>
+		<el-row>
+			<el-col :span="3" :offset="3" style="color: #000000;margin-top: 8px;font-size: 24px">BookExchange</el-col>
+			<el-col :span="13" :offset="5">
+				<component :is="loginInfo" transition-mode="out-in"></component>
+				<el-col>
+		</el-row>
+		<el-menu :default-active="index" class="el-menu-demo" mode="horizontal" @select="handleSelect" style="margin-left:-10px" v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="书评加载中,请稍等...">
+			<el-menu-item index="1" style="margin-left: 185px">首页</el-menu-item>
+			<el-menu-item index="2">书评</el-menu-item>
+			<el-menu-item index="3">讨论区</el-menu-item>
+			<el-menu-item index="4">书籍发布</el-menu-item>
+
+		</el-menu>
+		<br/>
+
+		<component :is="content" transition-mode="out-in"></component>
+
+		<br/>
+
+
+	</div>
+
+	<template id="first-template">
+	<transition name="fade">
+		<div style="width:100%">
+<el-row>
+	<el-col :span="7">
+		<el-input placeholder="请输入书名或者关键字查找书籍" v-model="input5" style="width: 640px;margin-left:190px">
+			<el-button slot="append" icon="search" @click="search"></el-button>
+		</el-input>
+		<div  style="width:650px;margin-top:15px;margin-left:190px">
+			<el-carousel >
+				<el-carousel-item v-for="banner in banners" style="width:100%">
+					<img :src="banner.src" style="width:100%"/>
+				</el-carousel-item>
+			</el-carousel>
+
+		</div>
+	</el-col>
+	<el-col :span="12">
+
+				<dl class="list sashimi" style="margin-top:-180px;margin-left:-260px">
+					<dt style="font-size:20px">分类查询</dt>
+					<dd><a href="#" @click="getA">古典文学</a></dd>
+					<dd><a href="#" @click="getB">科幻小说</a></dd>
+					<dd><a href="#" @click="getC">学术期刊</a></dd>
+					<dd><a href="#" @click="getD">儿童文学</a></dd>
+					<dd><a href="#" @click="getE">教辅资料</a></dd>
+					<dd><a href="#" @click="getF">娱乐杂志</a></dd>
+				</dl>
+
+	</el-col>
+
+	</el-row>
+	<p style="color:#20A0ff;margin-left: 100px;font-size: 20px"><strong>推荐书目</strong></p>
+	<p style="margin-top: -20px">_____________________________________________________________________________________________________________________________________________________________________________________________________________</p>
+	<br/>
+	<div id="container">
+		<div class="grid" v-for="(item,index) in items">
+			<div class="imgholder">
+				<img :src=item.src />
+			</div>
+			<a href="#" @click="toBook(index)"><strong>{{item.bookname}}</strong></a>
+			<div class="meta">by {{item.username}}</div>
+		</div>
+	</div>
+
+	</div>
+	</transition>
+	</template>
+
+	<template id="second-template">
+	<transition name="fade">
+		<div>
+		<el-row>
+			<el-input placeholder="请输入书名或者关键字查找书评" v-model="input5" style="width: 640px;margin-left:430px">
+				<el-button slot="append" icon="search" @click="search"></el-button>
+			</el-input>
+		</el-row>
+		<br>
+		<el-row>
+			<el-card class="box-card" v-for="(item7,index) in item7s" style="width:800px;margin-bottom: 10px;margin-left:350px">
+				<el-row>
+					<el-col :span="4">
+						<el-card class="box-card" style="margin-bottom: 2px; width:110px;height:150px;">
+							<img :src="item7.src" style="width:100px;height:140px;margin-left: -15px;margin-top: -14px"></img>
+						</el-card>
+					</el-col>
+					<el-col :span="10">
+						<a style="margin-top:10px;font-size:18px;display:inline" href="#" @click="toArticle(index)">{{item7.bookname}}</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;作者:&nbsp;&nbsp;{{item7.username}}
+						<br>
+						<br>
+						概述：
+
+						<br>
+						<div style="height:74px;width:400px;word-wrap:break-word;overflow:hidden;text-overflow: ellipsis;margin-buttom:8px;font-size:14px" v-html=item7.introduction></div>
+					</el-col>
+					<el-col :span="6" :offset="14" style="margin-top:-35px">
+						 <p>{{item7.time}}</p>
+					</el-col>
+				</el-row>
+			</el-card>
+		</el-row>
+		</div>
+
+	</transition>
+</template>
+
+	<template id="third-template">
+	<transition name="fade">
+		<div>
+			<p style="margin-top:-15px;margin-left:100px;font-size:20px;color:#FFFFFF">站内帖子</p>
+			<p style="margin-top: -30px">______________________________________________________________________________________________________________________________________________________________________________________________________________________________</p>
+			<el-row>
+				<el-card class="box-card" v-for="comment in comments" style="width:1200px;margin-bottom: 10px;margin-left:150px">
+					<el-row>
+						<el-col :span="4">
+							<div style="width:120px; height:120px; border-radius:50%; overflow:hidden;">
+								<img :src="comment.src" style="width:120px;height:120px"></img>
+							</div>
+							&nbsp;&nbsp;{{comment.username}}
+						</el-col>
+						<el-col :span="10">
+							<h2 style="margin-top:10px">{{comment.bookname}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h2>
+							概述：
+							<div style="height:74px;width:500px;word-wrap:break-word;overflow:hidden;text-overflow: ellipsis;margin-buttom:8px;font-size:14px">{{comment.introduction}}</div>
+						</el-col>
+						<el-col :span="6" :offset="19" style="margin-top:-35px">
+							 <p>{{comment.time}}</p>
+						</el-col>
+					</el-row>
+				</el-card>
+			</el-row>
+
+		</div>
+	</transition>
+</template>
+
+	<template id="four-template">
+	<transition name="fade">
+		<div v-loading.fullscreen.lock="fullscreenLoading"element-loading-text="上传中,请稍等...">
+			<br>
+			<br>
+			<br>
+			<el-row>
+				<el-col :span="6" :offset="3">
+					<form id="uploadForm"  method="post" enctype="multipart/form-data">
+						<label for="file">图书照片:</label>
+						<input type="file" name="file" id="file" onchange="javascript:setImagePreview();">
+						<div id="localImag"><img id="preview" width=-1 height=-1 style="diplay:none" /></div>
+						<br>
+					</form>
+				</el-col>
+				<el-col :span="8" :offset="1">
+						<el-form :model="formOfBook" label-position="left" label-width="90px">
+							<el-form-item label="书名">
+								<el-input v-model="formOfBook.bookname" style="width:220px"></el-input>
+							</el-form-item>
+							<el-form-item label="购买日期">
+									<el-date-picker style="width:220px" v-model="formOfBook.date" type="date" placeholder="选择日期" :picker-options="pickerOptions0">
+									</el-date-picker>
+							</el-form-item>
+							<el-form-item label="书籍类型">
+									<el-select v-model="formOfBook.kind" placeholder="请选择">
+										<el-option v-for="item in options" :label="item.label" :value="item.value">
+										</el-option>
+									</el-select>
+							</el-form-item>
+							<el-form-item label="想要的类型">
+									<el-select v-model="formOfBook.wantkind" placeholder="请选择">
+										<el-option v-for="item in options2" :label="item.label" :value="item.value">
+										</el-option>
+									</el-select>
+							</el-form-item>
+							<el-form-item label="书本简介" >
+								<el-input type="textarea" v-model="formOfBook.introduction" rows="5"></el-input>
+							</el-form-item>
+						</el-form>
+				</el-col>
+				<el-col :span="5" :offset="1">
+						<el-button type="primary" @click="upbook" style="width:300px;height:90px;margin-top:70px;font-size:40px">确定发布</el-button>
+				</el-col>
+			</el-row>
+		</div>
+	</transition>
+</template>
+
+	<template id="login-template">
+	<transition name="fade">
+		<el-row>
+			<el-col :span="2" style="margin-top:10px ">用户名:</el-col>
+			<el-col :span="2">
+			<el-input placeholder="请输入用户名" v-model="username" style="margin-left:10px ;margin-top:4px; width:180px;z-index: 999"></el-input>
+			</el-col>
+			<el-col :span="2" style="margin-top:10px;margin-left: 140px">密码:</el-col>
+			<el-col :span="2">
+			<el-input type="password" placeholder="请输入密码" v-model="password" style="margin-left: -20px;margin-top:4px; width:180px;z-index: 999"></el-input>
+			</el-col>
+
+		<el-row>
+			<el-button type="info" style="margin-left: 120px;margin-top: 5px;" @click="login"v-loading.fullscreen.lock="fullscreenLoading"element-loading-text="登陆中,请稍等...">登陆</el-button>
+			<el-button @click="regist">注册</el-button>
+	</transition>
+</template>
+
+	<template id="havelogin-template">
+	<transition name="fade">
+		<el-row>
+
+
+			<el-col :span="2" style="margin-top:3px;margin-left: 370px;font-size: 18px">
+				<div style="width:48px; height:48px; border-radius:50%; overflow:hidden">
+					<img width="48px" height="48px" :src=tempSrc solt="reference"/>
+				</div>
+			</el-col>
+
+
+		<el-row>
+			<el-button type="info" style="margin-left: 30px;margin-top: 10px;" @click="info" v-loading.fullscreen.lock="fullscreenLoading"element-loading-text="登陆中,请稍等...">个人信息</el-button>
+			<el-button @click="logout" >注销</el-button>
+	</transition>
+</template>
+
+	<template id="five-template">
+	<transition name="fade">
+			<div>
+				<el-row style=" margin-top: 20px">
+					<el-card style="width:1200px;margin-left:150px">
+					<el-col :span="14" offset="2">
+						<el-card>
+						<h2>{{articles[index]['title']}}</h2>
+						<br>
+						<div style=" position: relative;">
+							<el-row>
+								<el-col :span="2">
+									<div style="width:48px; height:48px; border-radius:50%; overflow:hidden;">
+										<img width="48px" height="48px" :src=articles[index]['authorpic']>
+									</div>
+								</el-col>
+								<el-col :span="6" :offset="1" style="margin-top:12px">
+									<span>{{articles[index]['username']}}</span>
+								</el-col>
+								<el-col :span="4" :offset="9">
+									<span style=" margin-left: 60px; font-size: 12px; position:absolute;right:5; bottom: 0">{{articles[index]['time']}}</span>
+									<el-col>
+							</el-row>
+						</div>
+						<br>
+						<el-card>
+						<div v-html=articles[index]['introduction']></div>
+						</el-card>
+						<br>
+						<br>
+						<br> 评论区
+						<br>
+						<br>
+						<div v-for="mycomment in comments">
+						<el-card>
+						<div style=" position: relative; margin-left: 60px; ">
+
+
+							<img   width="48" height="48" :src=mycomment.src style=" margin-left: -60px">
+							<span style=" position:absolute;top:0;">{{mycomment.username}}&nbsp;&nbsp;&nbsp;</span>
+							<span v-html=mycomment.comment></span>
+							<span style=" position:absolute;top:0;right:0;font-size: 12px; color:#475669">{{mycomment.time}}</span>
+
+						</div>
+						</el-card>
+						<br>
+						</div>
+						<br>
+						<template>
+					  <el-button type="text" @click="open3" style="color:#1F2D3D; font-size: 20px"><strong>>我来回应</strong></el-button>
+					</template>
+
+	</el-col>
+	<el-col :span="5" offset="1" style=" margin-top: 180px">
+		<img width="100" height="150" :src=articles[index]['src']>
+		<br>
+		<br>
+		<div style=" color: #475669; display: inline">书名:</div><span>{{articles[index]['bookname']}}</span>
+		<br>
+
+	</el-col>
+	</el-card>
+	</el-row>
+
+	</div>
+	</transition>
+	</template>
+
+<template id="book-template">
+	<transition name="fade">
+		<el-row>
+				<el-col :span="5" :offset="1">
+						<el-card style="width:100%">
+							<img :src=book['src'] style="width:100%" />
+							<br>
+							<h2>{{book['bookname']}}</h2>
+							<h3>书籍购买时间:{{book['buydate']}}</h3>
+							<h3>发布时间:{{book['date']}}</h3>
+							<h3>By: {{book['username']}}</h3>
+						</el-card>
+				</el-col>
+				<el-col :span="8" :offset="1">
+						<h2>简介:</h2>
+						<el-card>
+						<div><pre style="white-space: pre-wrap;word-wrap: break-word;font-family:Microsoft YaHei;">{{book['introduction']}}</pre></div>
+						</el-card>
+				</el-col>
+				<el-col :offset="1" :span="4">
+						<h2>ta想要的类型:&nbsp;&nbsp;{{book['wantkind']}}</h2>
+						<br/>
+						<br/>
+						<el-button type="primary" style="width:250px;height:90px;font-size:50;font-family:Microsoft YaHei;">和他交换</el-button>
+				</el-col>
+		</el-row>
+
+	</transition>
+</template>
+
+
+</body>
+<script src="/BookExchange/js/makisu.js"></script>
+
+<script type="text/javascript">
+	var tempName = getCookie("username");
+	var tempArticleData,tempBookData;
+	var tempArticleNumber,tempBookNumber;
+	var t;
+
+	Vue.component('book', {
+		template: '#book-template',
+		data: function() {
+			return {
+				book:tempBookData[tempBookNumber],
+			};
+		}
+
+	})
+
+	Vue.component('first', {
+		template: '#first-template',
+		data: function() {
+			return {
+				items: [{
+					username: '加载中',
+					bookname: '加载中',
+					introduction: "加载中",
+					src: "http://pic.58pic.com/58pic/14/70/20/69E58PICPjk_1024.jpg",
+				}],
+				input3: '',
+				input4: '',
+				input5: '',
+				select: '',
+				banners:[{src:"http://xplovesaber.top/bookEx/img/banner1.jpg"},
+					{src:"http://xplovesaber.top/bookEx/img/banner2.jpg"},
+					{src:"http://xplovesaber.top/bookEx/img/banner3.jpg"},
+					{src:"http://xplovesaber.top/bookEx/img/banner4.jpg"}]
+			};
+		},
+		methods: {
+			toBook: function(index) {
+					tempBookNumber=index;
+					app.content='book';
+			},
+			search:function(){
+					this.fullscreenLoading=true;
+				    this.$http.get("http://xplovesaber.top/bookEx/getBookByName.php?bookname="+this.input5).then((result) => {
+						this.$message({
+							type: 'success',
+							message: '成功获取'
+						});
+				    	this.items=eval(result.data).reverse();
+						tempBookData=eval(result.data).reverse();
+						this.fullscreenLoading=false;
+						var t=setTimeout("recover()",1000);
+						if(items.length==0){
+							this.$message({
+								type: 'error',
+								message: '找不到啦!'
+							});
+						}
+				    }, (error) => {
+						this.$message({
+							type: 'error',
+							message: '获取失败'
+						});
+				    })
+			},
+			getA:function(){
+				this.fullscreenLoading=true;
+				this.$http.get("http://xplovesaber.top/bookEx/getBookByKind.php?kind=古典文学").then((result) => {
+					this.$message({
+						type: 'success',
+						message: '成功获取'
+					});
+					this.items=eval(result.data);
+					this.fullscreenLoading=false;
+					var t=setTimeout("recover()",1000);
+					if(items.length==0){
+						this.$message({
+							type: 'error',
+							message: '找不到啦!'
+						});
+					}
+				}, (error) => {
+					this.$message({
+						type: 'error',
+						message: '获取失败'
+					});
+				})
+			},
+			getB:function(){
+				this.fullscreenLoading=true;
+				this.$http.get("http://xplovesaber.top/bookEx/getBookByKind.php?kind=科幻小说").then((result) => {
+					this.$message({
+						type: 'success',
+						message: '成功获取'
+					});
+					this.items=eval(result.data);
+					this.fullscreenLoading=false;
+					var t=setTimeout("recover()",1000);
+					if(items.length==0){
+						this.$message({
+							type: 'error',
+							message: '找不到啦!'
+						});
+					}
+				}, (error) => {
+					this.$message({
+						type: 'error',
+						message: '获取失败'
+					});
+				})
+			},
+			getC:function(){
+				this.fullscreenLoading=true;
+				this.$http.get("http://xplovesaber.top/bookEx/getBookByKind.php?kind=学术期刊").then((result) => {
+					this.$message({
+						type: 'success',
+						message: '成功获取'
+					});
+					this.items=eval(result.data);
+					this.fullscreenLoading=false;
+					var t=setTimeout("recover()",1000);
+					if(items.length==0){
+						this.$message({
+							type: 'error',
+							message: '找不到啦!'
+						});
+					}
+				}, (error) => {
+					this.$message({
+						type: 'error',
+						message: '获取失败'
+					});
+				})
+			},
+			getD:function(){
+				this.fullscreenLoading=true;
+				this.$http.get("http://xplovesaber.top/bookEx/getBookByKind.php?kind=儿童文学").then((result) => {
+					this.$message({
+						type: 'success',
+						message: '成功获取'
+					});
+					this.items=eval(result.data);
+					this.fullscreenLoading=false;
+					var t=setTimeout("recover()",1000);
+					if(items.length==0){
+						this.$message({
+							type: 'error',
+							message: '找不到啦!'
+						});
+					}
+				}, (error) => {
+					this.$message({
+						type: 'error',
+						message: '获取失败'
+					});
+				})
+			},
+			getE:function(){
+				this.fullscreenLoading=true;
+				this.$http.get("http://xplovesaber.top/bookEx/getBookByKind.php?kind=教辅资料").then((result) => {
+					this.$message({
+						type: 'success',
+						message: '成功获取'
+					});
+					this.items=eval(result.data);
+					this.fullscreenLoading=false;
+					var t=setTimeout("recover()",1000);
+					if(items.length==0){
+						this.$message({
+							type: 'error',
+							message: '找不到啦!'
+						});
+					}
+				}, (error) => {
+					this.$message({
+						type: 'error',
+						message: '获取失败'
+					});
+				})
+			},
+			getF:function(){
+				this.fullscreenLoading=true;
+				this.$http.get("http://xplovesaber.top/bookEx/getBookByKind.php?kind=娱乐杂志").then((result) => {
+					this.$message({
+						type: 'success',
+						message: '成功获取'
+					});
+					this.items=eval(result.data);
+					this.fullscreenLoading=false;
+					var t=setTimeout("recover()",1000);
+					if(items.length==0){
+						this.$message({
+							type: 'error',
+							message: '找不到啦!'
+						});
+					}
+				}, (error) => {
+					this.$message({
+						type: 'error',
+						message: '获取失败'
+					});
+				})
+			}
+		},
+		mounted: function() {
+			    this.$http.get("http://xplovesaber.top/bookEx/getAllBook.php").then((result) => {
+
+			    	this.items=eval(result.data).reverse();
+					tempBookData=eval(result.data).reverse();
+					var t=setTimeout("recover()",3000);
+			    }, (error) => {
+					this.$message({
+						type: 'error',
+						message: '加载失败'
+					});
+			    })
+				this.$nextTick(function(){
+					var t=setTimeout("recover()",1000);
+				})
+
+
+		}
+
+	})
+	Vue.component('second', {
+		template: '#second-template',
+		data: function() {
+			return {
+				item7s: tempArticleData,
+				input5:'',
+			};
+		},
+		methods: {
+			toArticle: function(index) {
+				app.content = 'five';
+				tempArticleNumber = index;
+			},
+			search:function(){
+					this.fullscreenLoading=true;
+				    this.$http.get("http://xplovesaber.top/bookEx/getArticleByName.php?bookname="+this.input5).then((result) => {
+						this.fullscreenLoading=false;
+						this.$message({
+							type: 'success',
+							message: '成功发送评论'
+						});
+				    	this.item7s=eval(result.data);
+						if(item7s.length==0){
+							this.$message({
+								type: 'error',
+								message: '找不到啦!'
+							});
+						}
+				    }, (error) => {
+						this.$message({
+							type: 'error',
+							message: '搜索失败!'
+						});
+
+				    })
+			}
+		}
+
+	})
+
+	Vue.component('five', {
+		template: '#five-template',
+		data: function() {
+			return {
+				articles: tempArticleData,
+				index: tempArticleNumber,
+				comments: [],
+			};
+		},
+		methods: {
+			open3() {
+				this.$prompt('你相对这篇书评要说的', '评论', {
+					confirmButtonText: '确定',
+					cancelButtonText: '取消',
+					//inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
+					//inputErrorMessage: '邮箱格式不正确'
+				}).then(({
+					value
+				}) => {
+					var temptime = getNowFormatDate();
+					this.$http.get("http://xplovesaber.top/bookEx/addComment.php?username=" + getCookie('username') + "&&comment=" + value + "&&articleid=" + tempArticleData[tempArticleNumber]['id'] + "&&time=" + temptime).then((result) => {
+						this.$message({
+							type: 'success',
+							message: '成功发送评论'
+						});
+						this.comments.unshift({
+							'username': getCookie('username'),
+							'comment': value,
+							'articleid': tempArticleData[tempArticleNumber]['id'],
+							'time': temptime
+						})
+					}, (error) => {
+						this.$message({
+							type: 'error',
+							message: '发送评论失败'
+						});
+					})
+
+				}).catch(() => {
+					this.$message({
+						type: 'info',
+						message: '取消评论'
+					});
+				});
+			}
+		},
+		mounted: function() {
+			this.$http.get('http://xplovesaber.top/bookEx/getArticleComment.php?id=' + tempArticleData[tempArticleNumber]['id']).then((result) => {
+				this.comments = eval(result.data).reverse();
+			}, (error) => {
+
+			})
+		}
+
+	})
+
+	Vue.component('third', {
+		template: '#third-template',
+		data: function() {
+			return {
+				comments: [{
+					bookname: 'Foo',
+					username: 'MezereonXP',
+					introduction: "SaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaber",
+					src: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
+					time: "2016年12月30日18:58:24"
+				}, {
+					bookname: 'Foo',
+					username: 'MezereonXP',
+					introduction: "SaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaber",
+					src: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
+					time: "2016年12月30日18:58:24"
+				}, {
+					bookname: 'Foo',
+					username: 'MezereonXP',
+					introduction: "SaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaber",
+					src: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
+					time: "2016年12月30日18:58:24"
+				}, {
+					bookname: 'Foo',
+					username: 'MezereonXP',
+					introduction: "SaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaber",
+					src: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
+					time: "2016年12月30日18:58:24"
+				}, {
+					bookname: 'Foo',
+					username: 'MezereonXP',
+					introduction: "SaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaber",
+					src: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
+					time: "2016年12月30日18:58:24"
+				}, {
+					bookname: 'Foo',
+					username: 'MezereonXP',
+					introduction: "SaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaber",
+					src: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
+					time: "2016年12月30日18:58:24"
+				}]
+			};
+		}
+
+	})
+	Vue.component('four', {
+		template: '#four-template',
+		data: function() {
+			return {
+				fullscreenLoading:false,
+				fileList: [],
+				options: [{
+					value: '古典文学',
+					label: '古典文学'
+				}, {
+					value: '科幻小说',
+					label: '科幻小说'
+				}, {
+					value: '学术期刊',
+					label: '学术期刊'
+				}, {
+					value: '儿童文学',
+					label: '儿童文学'
+				}, {
+					value: '教辅资料',
+					label: '教辅资料'
+				}, {
+					value: '娱乐杂志',
+					label: '娱乐杂志'
+				}],
+				options2: [{
+					value: '古典文学',
+					label: '古典文学'
+				}, {
+					value: '科幻小说',
+					label: '科幻小说'
+				}, {
+					value: '学术期刊',
+					label: '学术期刊'
+				}, {
+					value: '儿童文学',
+					label: '儿童文学'
+				}, {
+					value: '教辅资料',
+					label: '教辅资料'
+				}, {
+					value: '娱乐杂志',
+					label: '娱乐杂志'
+				}],
+				value: '',
+				formOfBook: {
+					bookname: '',
+					date: '',
+					kind: '',
+					wantkind: '',
+					introduction: ''
+				}
+			};
+		},
+		methods: {
+			handleRemove(file, fileList) {
+				console.log(file, fileList);
+			},
+			handlePreview(file) {
+				console.log(file);
+			},
+			upbook:function(){
+				this.fullscreenLoading=true;
+				var formElement = document.getElementById("uploadForm");
+				var d=new FormData(formElement);
+				d.append('username',getCookie('username'));
+				d.append('bookname',this.formOfBook.bookname);
+				var date1 = new Date(this.formOfBook.date);
+				var	youWant=date1.getFullYear() + '-' + (date1.getMonth() + 1) + '-' + date1.getDate();
+				d.append('buydate',youWant);
+				d.append('kind',this.formOfBook.kind);
+				d.append('wantkind',this.formOfBook.wantkind);
+				d.append('introduction',this.formOfBook.introduction);
+				d.append('date',getNowFormatDate());
+				this.$http.post("http://xplovesaber.top/bookEx/upbook.php",d).then((response) => {
+					this.fullscreenLoading=false;
+					this.$message({
+						showClose: true,
+						message: "上传成功",
+						type: 'success'
+					});
+					app.content='first';
+				}, (error) => {
+					this.fullscreenLoading=false;
+					this.$message({
+						showClose: true,
+						message: "上传失败",
+						type: 'error'
+					});
+				})
+			}
+		}
+
+	})
+
+	Vue.component('havelogin', {
+		template: '#havelogin-template',
+		data: function() {
+			return {
+				tempname: tempName,
+				tempSrc: getCookie('userpic'),
+				fullscreenLoading: false,
+			};
+		},
+		methods: {
+			logout: function() {
+				delCookie('username');
+				delCookie('signatrue');
+				delCookie('userpic');
+				tempName = null;
+				app.loginInfo = 'login';
+				app.content = 'first';
+				app.index = '1';
+			},
+			info: function() {
+				window.location.href = ('/BookExchange/self.html');
+			}
+		}
+
+	})
+
+	Vue.component('login', {
+		template: '#login-template',
+		data: function() {
+			return {
+				username: '',
+				password: '',
+				fullscreenLoading: false,
+			};
+		},
+		methods: {
+			login: function() {
+				if (this.username == '' || this.password == '') {
+					this.$message({
+						showClose: true,
+						message: "请输入用户名和密码！",
+						type: 'error'
+					});
+				} else {
+					this.fullscreenLoading = true;
+					var url = "http://xplovesaber.top/bookEx/getInfo.php?username=" + this.username;
+					tempName = this.username;
+					this.$http.get(url)
+						.then((response) => {
+							var userdata = eval(response.data);
+							if (userdata[0]['password'] == this.password) {
+								this.fullscreenLoading = false;
+								this.$message({
+									showClose: true,
+									message: "登陆成功",
+									type: 'success'
+								});
+								setCookie("username", userdata[0]['username']);
+								setCookie('signatrue', userdata[0]['signatrue']);
+								setCookie('userpic', userdata[0]['src']);
+								app.loginInfo = 'havelogin';
+							} else {
+								this.fullscreenLoading = false;
+								this.$message({
+									showClose: true,
+									message: "用户名或密码错误！",
+									type: 'error'
+								});
+
+							}
+						}, (error) => {
+							this.fullscreenLoading = false;
+							this.$message({
+								showClose: true,
+								message: "登陆出错！",
+								type: 'error'
+							});
+						})
+				}
+
+
+			},
+			regist: function() {
+				window.location.href = '/BookExchange/register.html';
+			}
+		}
+
+	})
+
+	var app = new Vue({
+		el: '#app',
+		data: {
+			loginInfo: tempName != null ? 'havelogin' : 'login',
+			content: 'first',
+			bookData: ["saber", "archer", "caster"],
+			index: '1',
+			fullscreenLoading: false,
+		},
+		methods: {
+			handleSelect(key, keyPath) {
+				console.log(key, keyPath);
+				if (key == '1') {
+					this.content = 'first';
+					t=setTimeout("recover()",100);
+				} else if (key == '2') {
+					if (tempArticleData == null) {
+						this.fullscreenLoading = true;
+						var url = "http://xplovesaber.top/bookEx/getArticleInfo.php";
+						this.$http.get(url)
+							.then((response) => {
+								this.fullscreenLoading = false;
+								tempArticleData = eval(response.data);
+								this.content = 'second';
+							}, (error) => {
+								this.fullscreenLoading = false;
+								this.$message({
+									showClose: true,
+									message: "获取失败",
+									type: 'error'
+								});
+							})
+
+					} else {
+						this.content = 'second';
+					}
+				} else if (key == '3') {
+					this.content = 'third';
+				} else if (key == '4') {
+					if (tempName != null) {
+						this.content = 'four';
+					} else {
+						window.location.href = "/BookExchange/register.html"
+					}
+
+				}
+			}
+		}
+
+	})
+
+	function setCookie(name, value) {
+		var Days = 30;
+		var exp = new Date();
+		exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+		document.cookie = name + "=" + escape(value) + ";expires=" + exp.toGMTString();
+	}
+
+	function getCookie(name) {
+		var arr, reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+		if (arr = document.cookie.match(reg))
+			return unescape(arr[2]);
+		else
+			return null;
+	}
+
+	function delCookie(name) {
+		var exp = new Date();
+		exp.setTime(exp.getTime() - 1);
+		var cval = getCookie(name);
+		if (cval != null)
+			document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+	}
+
+	function getNowFormatDate() {
+		var date = new Date();
+		var seperator1 = "-";
+		var seperator2 = ":";
+		var month = date.getMonth() + 1;
+		var strDate = date.getDate();
+		if (month >= 1 && month <= 9) {
+			month = "0" + month;
+		}
+		if (strDate >= 0 && strDate <= 9) {
+			strDate = "0" + strDate;
+		}
+		var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate +
+			" " + date.getHours() + seperator2 + date.getMinutes() +
+			seperator2 + date.getSeconds();
+		return currentdate;
+	}
+	function recover(){
+
+			$('#container').BlocksIt({
+				numOfCol: 5,
+				offsetX: 8,
+				offsetY: 8,
+				blockElement: '.grid'
+			});
+
+
+		//window resize
+		var currentWidth = 1100;
+		$(window).resize(function() {
+			var winWidth = $(window).width();
+			var conWidth;
+			if (winWidth < 660) {
+				conWidth = 440;
+				col = 2
+			} else if (winWidth < 880) {
+				conWidth = 660;
+				col = 3
+			} else if (winWidth < 1100) {
+				conWidth = 880;
+				col = 4;
+			} else {
+				conWidth = 1100;
+				col = 5;
+			}
+
+			if (conWidth != currentWidth) {
+				currentWidth = conWidth;
+				$('#container').width(conWidth);
+				$('#container').BlocksIt({
+					numOfCol: col,
+					offsetX: 8,
+					offsetY: 8
+				});
+			}
+		});
+
+		var $sashimi = $( '.sashimi' );
+		var $nigiri = $( '.nigiri' );
+		var $maki = $( '.maki' );
+
+		// Create Makisus
+
+		$sashimi.makisu({
+			selector: 'dd',
+			overlap: 0.2,
+			speed: 0.5
+		});
+
+		// Open all
+
+		$( '.list' ).makisu( 'open' );
+
+
+		// Disable all links
+
+		$( '.demo a' ).click( function( event ) {
+			event.preventDefault();
+		});
+		clearTimeout(t);
+	}
+
+	function setImagePreview()
+    {
+            var docObj=document.getElementById("file");
+            var imgObjPreview=document.getElementById("preview");
+            if(docObj.files &&    docObj.files[0])
+            {
+                //火狐下，直接设img属性
+                imgObjPreview.style.display = 'block';
+                imgObjPreview.style.width = '200px';
+                imgObjPreview.style.height = '200px';
+               //imgObjPreview.src = docObj.files[0].getAsDataURL();
+               //火狐7以上版本不能用上面的getAsDataURL()方式获取，需要一下方式
+                imgObjPreview.src = window.URL.createObjectURL(docObj.files[0]);
+            }
+            else
+            {
+                //IE下，使用滤镜
+                docObj.select();
+                var imgSrc = document.selection.createRange().text;
+                var localImagId = document.getElementById("localImag");
+                //必须设置初始大小
+                localImagId.style.width = "300px";
+                localImagId.style.height = "120px";
+                //图片异常的捕捉，防止用户修改后缀来伪造图片
+                try
+                {
+                    localImagId.style.filter="progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)";
+                    localImagId.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = imgSrc;
+                }
+                catch(e)
+                {
+                    alert("您上传的图片格式不正确，请重新选择!");
+                    return false;
+                }
+                    imgObjPreview.style.display = 'none';
+                    document.selection.empty();
+             }
+             return true;
+     }
+</script>
+
+
+
+
+<style type="text/css">
+	.fade-enter-active,
+	.fade-leave-active {
+		transition: opacity .5s
+	}
+
+	.fade-enter,
+	.fade-leave-active {
+		opacity: 0
+	}
+</style>
+<style>
+	.el-carousel__item h3 {
+		color: #475669;
+		font-size: 18px;
+		opacity: 0.75;
+		line-height: 300px;
+		margin: 0;
+	}
+
+	.el-carousel__item:nth-child(2n) {
+		background-color: #99a9bf;
+	}
+
+	.el-carousel__item:nth-child(2n+1) {
+		background-color: #d3dce6;
+	}
+
+	.demo:after {
+
+	    box-shadow: 0 1px 16px rgba(0,0,0,0.15);
+	    background: #1b1b1b;
+	    position: absolute;
+	    content: '';
+	    height: 10px;
+	    width: 100%;
+	    top: 0;
+	}
+
+	/* List styles */
+
+	.list {
+
+	    -webkit-transform-style: preserve-3d;
+	    -moz-transform-style: preserve-3d;
+	    -ms-transform-style: preserve-3d;
+	    -o-transform-style: preserve-3d;
+	    transform-style: preserve-3d;
+
+	    text-transform: uppercase;
+	    position: absolute;
+	    margin-left: -140px;
+	    margin-top: -280px;
+	    top: 55%;
+	}
+
+	.list a {
+
+	    display: block;
+	    color: #fff;
+	}
+
+	.list a:hover {
+	    text-indent: 20px;
+	}
+
+	.list dt, .list dd {
+
+	    text-indent: 10px;
+	    line-height: 55px;
+	    background: #E0FBAC;
+	    margin: 0;
+	    height: 55px;
+	    width: 370px;
+	    color: #fff;
+	}
+
+	.list dt {
+
+	    /* Since we're hiding elements behind here, we need it in 3d */
+	    -webkit-transform: translateZ(0.3px);
+	    -moz-transform: translateZ(0.3px);
+	    -ms-transform: translateZ(0.3px);
+	    -o-transform: translateZ(0.3px);
+	    transform: translateZ(0.3px);
+
+	    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+	    font-size: 15px;
+	}
+
+	.list dd {
+
+	    border-top: 1px dashed rgba(255,255,255,0.3);
+	    line-height: 35px;
+	    font-size: 18px;
+	    height: 35px;
+	    margin: 0;
+	}
+
+
+
+	/* Individual styles */
+
+	.sashimi dt, .sashimi dd, .sashimi a { background: #73C8A9; }
+	.nigiri dt, .nigiri dd, .nigiri a { background: #E32551; }
+	.maki dt, .maki dd, .maki a { background: #FFC219; }
+
+	.sashimi a:hover { background: #61c19e; }
+	.nigiri a:hover { background: #d31b46; }
+	.maki a:hover { background: #ffbb00; }
+
+	.sashimi {
+
+	    -webkit-transform: perspective(1200px) rotateY(-40deg) !important;
+	    -moz-transform: perspective(1200px) rotateY(-40deg) !important;
+	    -ms-transform: perspective(1200px) rotateY(-40deg) !important;
+	    -o-transform: perspective(1200px) rotateY(-40deg) !important;
+	    transform: perspective(1200px) rotateY(-40deg) !important;
+
+	    -webkit-transform-origin: -10% 25%;
+	    -moz-transform-origin: -10% 25%;
+	    -ms-transform-origin: -10% 25%;
+	    -o-transform-origin: -10% 25%;
+	    transform-origin: -10% 25%;
+
+	    left: 80%;
+	}
+</style>
+
+
+
+
+</html>

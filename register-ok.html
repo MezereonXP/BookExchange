@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <!-- 引入样式 -->
+  <link href="https://unpkg.com/element-ui/lib/theme-default/index.css" rel="stylesheet" type="text/css">
+</head>
+<body align="center" style="  margin-top: 290px" >
+    <p style="font-size:22px;color:#13CE66"><strong>注册成功！</strong></p>
+	<p style=" color: #FF4949; display: inline; font-size: 18px" id="message" ></p>&nbsp;&nbsp;<a href="/BookExchange/index.html" style=" color: #FF4949; font-size: 18px">点击跳转</a>
+</body>
+<script type="text/javascript">
+var count=6;
+window.onload=timeOn();
+function timeOn(){
+	 document.getElementById("message").innerHTML=count+"秒后自动跳转";
+	 circle();
+}
+function circle(){
+	        t=setTimeout("circle()",1000);
+            count--;
+            document.getElementById("message").innerHTML=count+"秒后自动跳转";
+            if(count==0){
+              clearTimeout(t);
+               window.location.href="/BookExchange/index.html";
+            }
+}
+</script>
