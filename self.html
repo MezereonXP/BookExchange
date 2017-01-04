@@ -105,10 +105,11 @@
                     <el-col :span="4" :offset="1"style="margin-top:65px">
                             <el-button type="primary" v-if=!(changedbook.usernamea==username)&&changedbook.status==0 @click="agree(index)">同意</el-button>
                             <el-button type="danger" v-if=!(changedbook.usernamea==username)&&changedbook.status==0 @click="refuse">拒绝</el-button>
-                            <el-button type="primary" v-if=(changedbook.status==1) @click="send">发布物流</el-button>
-                            <el-button type="primary" v-if=(changedbook.status==2) @click="recevie">确认收货</el-button>
+                            <el-button type="primary" v-if=(changedbook.status==1&&(((changedbook.usernamea==username)&&(changedbook.numbera!=''))||((changedbook.usernamea!=username)&&(changedbook.numberb!='')))) @click="send(index)">发布物流</el-button>
+                            <el-button type="primary" v-if=(changedbook.status==2) @click="recevie(index)">确认收货</el-button>
+                            <p v-if=(changedbook.status=='1')>对方的单号为:{{changedbook.usernamea==username?changedbook.numbera:changedbook.numberb}}</p>
                     </el-col>
-                    <el-col :span="4" style="margin-top:50px">
+                    <el-col :span="4" :offset="2" style="margin-top:50px">
                         <el-steps :space="100" :active=changedbook.status finish-status="success">
                           <el-step title="待双方同意"></el-step>
                           <el-step title="物流"></el-step>
@@ -303,7 +304,6 @@
         mounted: function(){
                 this.$http.get("http://xplovesaber.top/bookEx/getUserArticle.php?username="+getCookie('username')).then((result) => {
                         this.mycomments=eval(result.data).reverse();
-
                 }, (error) => {
                         alert("fail!")
                 })
@@ -364,11 +364,64 @@
                         });
                     })
                 },
-                send:function(){
+                send:function(index){
+                    this.$prompt('请输入快递单号', '提示', {
+                                  confirmButtonText: '确定',
+                                  cancelButtonText: '取消',
+                                }).then(({ value }) => {
+                                    if(tempExchangeData[index]['usernamea']==getCookie('username')){
+                                        this.$http.get("http://xplovesaber.top/bookEx/send.php?number="+value+"&&id="+tempExchangeData[index]['id']+"&&kind=1").then((result) => {
+                                            this.$notify({
+                                                title: '成功',
+                                                message: '上传物流单号成功',
+                                                type: 'success'
+                                            });
+                                        }, (error) => {
+                                            this.$notify({
+                                                title: '失败',
+                                                message: '向服务器请求失败',
+                                                type: 'error'
+                                            });
+                                        })
+                                    }else{
+                                        this.$http.get("http://xplovesaber.top/bookEx/send.php?number="+value+"&&id="+tempExchangeData[index]['id']+"&&kind=2").then((result) => {
+                                            this.$notify({
+                                                title: '成功',
+                                                message: '上传物流单号成功',
+                                                type: 'success'
+                                            });
+                                        }, (error) => {
+                                            this.$notify({
+                                                title: '失败',
+                                                message: '向服务器请求失败',
+                                                type: 'error'
+                                            });
+                                        })
+                                    }
 
+
+                                }).catch(() => {
+                                  this.$message({
+                                    type: 'info',
+                                    message: '取消输入'
+                                  });
+                                });
                 },
-                recevie:function(){
+                recevie:function(index){
 
+                                this.$http.get("http://xplovesaber.top/bookEx/recevie.php?id="tempExchangeData[index]['id']+"&&kind="+(tempExchangeData[index]['usernamea']==tempName?1:2)).then((result) => {
+                                    this.$notify({
+                                        title: '成功',
+                                        message: '确认成功',
+                                        type: 'success'
+                                    });
+                                }, (error) => {
+                                    this.$notify({
+                                        title: '失败',
+                                        message: '向服务器请求失败',
+                                        type: 'error'
+                                    });
+                                })
                 }
         },
         mounted:function(){
