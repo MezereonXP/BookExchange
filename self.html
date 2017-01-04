@@ -86,8 +86,8 @@
     </template>
     <template id="changed-template">
         <transition name="fade">
-            <div>
-            <el-card class="box-card" v-for="changedbook in changedbooks" style="width:1200px;margin-bottom: 10px;margin-left:160px">
+            <div v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="向服务器请求中...">
+            <el-card class="box-card" v-for="(changedbook,index) in changedbooks" style="width:1200px;margin-bottom: 10px;margin-left:160px">
                 <el-row>
                     <el-col :span="2">
                         <el-card class="box-card" style="margin-bottom: 2px; width:110px;height:150px;">
@@ -103,10 +103,10 @@
                         </el-card>
                     </el-col>
                     <el-col :span="4" :offset="1"style="margin-top:65px">
-                            <el-button type="primary" v-if=!(changedbook.usernamea==username)>同意</el-button>
-                            <el-button type="danger" v-if=!(changedbook.usernamea==username)>拒绝</el-button>
-                            <el-button type="primary" v-if=(changedbook.status=='1')>发布物流</el-button>
-                            <el-button type="primary" v-if=(changedbook.status=='2')>确认收货</el-button>
+                            <el-button type="primary" v-if=!(changedbook.usernamea==username) @click="agree(index)">同意</el-button>
+                            <el-button type="danger" v-if=!(changedbook.usernamea==username) @click="refuse">拒绝</el-button>
+                            <el-button type="primary" v-if=(changedbook.status=='1') @click="send">发布物流</el-button>
+                            <el-button type="primary" v-if=(changedbook.status=='2') @click="recevie">确认收货</el-button>
                     </el-col>
                     <el-col :span="4" style="margin-top:50px">
                         <el-steps :space="100" :active="changedbook.status" finish-status="success">
@@ -247,7 +247,7 @@
     </template>
 </body>
 <script>
-    var tempName, tempPhone, tempSex, id, tempEmail, tempPassword, tempdata;
+    var tempName, tempPhone, tempSex, id, tempEmail, tempPassword, tempdata,tempExchangeData;
     var tempArticle;
 
     tempName=getCookie('username');
@@ -302,7 +302,8 @@
         },
         mounted: function(){
                 this.$http.get("http://xplovesaber.top/bookEx/getUserArticle.php?username="+getCookie('username')).then((result) => {
-                        this.mycomments=eval(result.data)
+                        this.mycomments=eval(result.data).reverse();
+                        tempExchangeData=eval(result.data).reverse();
                 }, (error) => {
                         alert("fail!")
                 })
@@ -313,6 +314,7 @@
         template: '#changed-template',
         data: function() {
             return {
+                fullscreenLoading:false,
                 username:tempName,
                 changedbooks: [{
                     booksrca:'http://pic.58pic.com/58pic/14/70/20/69E58PICPjk_1024.jpg',
@@ -325,7 +327,28 @@
             };
         },
         methods: {
+                agree:function(index){
+                    this.fullscreenLoading=true;
+                    this.$http.get("http://xplovesaber.top/bookEx/setExchange.php?id="+tempExchangeData[index]['id']+"&&bookid="+tempExchangeData[index]['bookidb']).then((result) => {
+                        this.fullscreenLoading=false;
+                        this.$notify({
+                            title: '成功',
+                            message: '同意交换',
+                            type: 'success'
+                        });
+                        this.changedbooks[index]['status']='1';
+                    }, (error) => {
+                        this.fullscreenLoading=false;
+                        this.$notify({
+                            title: '失败',
+                            message: '向服务器请求失败',
+                            type: 'error'
+                        });
+                    })
+                },
+                refuse:function(){
 
+                }
         },
         mounted:function(){
                 this.$http.get("http://xplovesaber.top/bookEx/getExchange.php?username="+tempName).then((result) => {
