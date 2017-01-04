@@ -46,7 +46,7 @@
         <el-row>
             <el-menu theme="dark" default-active="1" class="el-menu-demo" mode="horizontal" @select="handleSelect">
                 <el-menu-item style="margin-left:450px" index="1">我的书评</el-menu-item>
-                <el-menu-item index="2">已交换书籍</el-menu-item>
+                <el-menu-item index="2">交换请求</el-menu-item>
                 <el-menu-item index="3">待交换书籍</el-menu-item>
                 <el-menu-item index="4">发布书籍</el-menu-item>
                 <el-menu-item index="5">个人信息修改</el-menu-item>
@@ -89,31 +89,34 @@
             <div>
             <el-card class="box-card" v-for="changedbook in changedbooks" style="width:1200px;margin-bottom: 10px;margin-left:160px">
                 <el-row>
-                    <el-col :span="3">
+                    <el-col :span="2">
                         <el-card class="box-card" style="margin-bottom: 2px; width:110px;height:150px;">
-                            <img :src="changedbook.src1" style="width:100px;height:140px;margin-left: -15px;margin-top: -14px"></img>
+                            <img :src="changedbook.booksrca" style="width:100px;height:140px;margin-left: -15px;margin-top: -14px"></img>
                         </el-card>
                     </el-col>
-                    <el-col :span="2" :offset="1"style="margin-top:70px">
-                        <i class="el-icon-more" style="margin-right:3px"></i><i class="el-icon-d-arrow-right"></i>
+                    <el-col :span="2" :offset="1" style="margin-top:70px">
+                        <i class="el-icon-more" style="margin-right:16px"></i>
                     </el-col>
-                    <el-col :span="3">
+                    <el-col :span="2" style="margin-left:-45px">
                         <el-card class="box-card" style="margin-bottom: 2px; width:110px;height:150px;">
-                            <img :src="changedbook.src2" style="width:100px;height:140px;margin-left: -15px;margin-top: -14px"></img>
+                            <img :src="changedbook.booksrcb" style="width:100px;height:140px;margin-left: -15px;margin-top: -14px"></img>
                         </el-card>
                     </el-col>
                     <el-col :span="4" :offset="1"style="margin-top:65px">
-                        {{changedbook.bookname1}}&nbsp;&nbsp;<i class="el-icon-more" style="margin-right:3px"></i><i class="el-icon-d-arrow-right"></i>&nbsp;&nbsp;{{changedbook.bookname2}}
+                            <el-button type="primary" v-if=!(changedbook.usernamea==username)>同意</el-button>
+                            <el-button type="danger" v-if=!(changedbook.usernamea==username)>拒绝</el-button>
+                            <el-button type="primary" v-if=(changedbook.status=='1')>发布物流</el-button>
+                            <el-button type="primary" v-if=(changedbook.status=='2')>确认收货</el-button>
                     </el-col>
                     <el-col :span="4" style="margin-top:50px">
-                        <el-steps :space="100" :active="1" finish-status="success">
+                        <el-steps :space="100" :active="changedbook.status" finish-status="success">
                           <el-step title="待双方同意"></el-step>
                           <el-step title="物流"></el-step>
                           <el-step title="互评"></el-step>
                         </el-steps>
                     </el-col>
-                    <el-col :span="5" :offset="1" style="margin-top:50px;margin-left:48px">
-                         <p>{{changedbook.time}}</p>
+                    <el-col :span="5" :offset="2" style="margin-top:50px;margin-left:90px">
+                         <p>{{changedbook.date}}</p>
                     </el-col>
                 </el-row>
             </el-card>
@@ -310,59 +313,30 @@
         template: '#changed-template',
         data: function() {
             return {
+                username:tempName,
                 changedbooks: [{
-                    bookname1: 'Foo',
-                    bookname2: 'Foo',
-                    username1: 'MezereonXP',
-                    username2: 'MezereonXP',
-                    src1: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
-                    src2: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
-                    time: "2016年12月30日18:58:24"
-                }, {
-                    bookname1: 'Foo',
-                    bookname2: 'Foo',
-                    username1: 'MezereonXP',
-                    username2: 'MezereonXP',
-                    src1: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
-                    src2: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
-                    time: "2016年12月30日18:58:24"
-                }, {
-                    bookname1: 'Foo',
-                    bookname2: 'Foo',
-                    username1: 'MezereonXP',
-                    username2: 'MezereonXP',
-                    src1: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
-                    src2: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
-                    time: "2016年12月30日18:58:24"
-                }, {
-                    bookname1: 'Foo',
-                    bookname2: 'Foo',
-                    username1: 'MezereonXP',
-                    username2: 'MezereonXP',
-                    src1: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
-                    src2: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
-                    time: "2016年12月30日18:58:24"
-                }, {
-                    bookname1: 'Foo',
-                    bookname2: 'Foo',
-                    username1: 'MezereonXP',
-                    username2: 'MezereonXP',
-                    src1: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
-                    src2: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
-                    time: "2016年12月30日18:58:24"
-                }, {
-                    bookname1: 'Foo',
-                    bookname2: 'Foo',
-                    username1: 'MezereonXP',
-                    username2: 'MezereonXP',
-                    src1: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
-                    src2: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
-                    time: "2016年12月30日18:58:24"
-                }]
+                    booksrca:'http://pic.58pic.com/58pic/14/70/20/69E58PICPjk_1024.jpg',
+                    booksrcb:'http://pic.58pic.com/58pic/14/70/20/69E58PICPjk_1024.jpg',
+                    date:'2017-01-04 21:11:02',
+                    status:'0',
+                    usernamea:'xp',
+                    usernameb:'wyb',
+                }],
             };
         },
         methods: {
 
+        },
+        mounted:function(){
+                this.$http.get("http://xplovesaber.top/bookEx/getExchange.php?username="+tempName).then((result) => {
+                        this.changedbooks=eval(result.data);
+                }, (error) => {
+                    this.$notify({
+                        title: '失败',
+                        message: '获取交换请求失败',
+                        type: 'error'
+                    });
+                })
         }
 
     })

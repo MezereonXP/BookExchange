@@ -344,7 +344,7 @@
 
 	<template id="book-template">
 	<transition name="fade">
-		<el-row>
+		<el-row v-loading.fullscreen.lock="fullscreenLoading"element-loading-text="申请交换中,请稍等...">
 				<el-col :span="5" :offset="1">
 						<el-card style="width:100%">
 							<img :src=book['src'] style="width:100%" />
@@ -401,12 +401,27 @@
 						  id: '加载中',
 						  bookname: '加载中'
 						}],
-						value4: ''
+				value4: '',
+				fullscreenLoading:false,
 			};
 		},
 		methods: {
 			exchange: function() {
-
+				this.fullscreenLoading=true;
+				    this.$http.get("http://xplovesaber.top/bookEx/exchange.php?ida="+this.value4+"&&idb="+this.book['id']+"&&usernamea="+getCookie('username')+"&&usernameb="+this.book['username']+"&&date="+getNowFormatDate()).then((result) => {
+				    		this.fullscreenLoading=false;
+							app.$message({
+								type: 'success',
+								message: '申请交换成功！',
+							});
+							window.location.reload();
+				    }, (error) => {
+				    		this.fullscreenLoading=false;
+							this.$message({
+								type: 'error',
+								message: '申请交换失败！',
+							});
+				    })
 			}
 		},
 		mounted:function(){
