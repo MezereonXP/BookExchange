@@ -342,7 +342,7 @@
 	</transition>
 	</template>
 
-<template id="book-template">
+	<template id="book-template">
 	<transition name="fade">
 		<el-row>
 				<el-col :span="5" :offset="1">
@@ -357,16 +357,24 @@
 				</el-col>
 				<el-col :span="8" :offset="1">
 						<h2>简介:</h2>
-						<div>123</div>
-						<div>1234</div>
 						<el-card>
 						<div><pre style="white-space: pre-wrap;word-wrap: break-word;font-family:Microsoft YaHei;">{{book['introduction']}}</pre></div>
 						</el-card>
 				</el-col>
 				<el-col :offset="1" :span="4">
 						<h2>ta想要的类型:&nbsp;&nbsp;{{book['wantkind']}}</h2>
-						<el-button type="primary" style="font-family:Microsoft YaHei;" @click="exchange">
-							<p style="font-size:22px">和他交换</p>
+						<el-select v-model="value4" clearable placeholder="请选择您与之想交换的书籍">
+						  <el-option
+							v-for="item in options"
+							:label="item.bookname"
+							:value="item.id">
+						  </el-option>
+						</el-select>
+						<br/>
+						<br/>
+						<br/>
+						<el-button type="primary" style="font-family:Microsoft YaHei;font-size:20px" @click="exchange" :disabled=(value4=='')>
+							和他交换
 						</el-button>
 				</el-col>
 		</el-row>
@@ -380,21 +388,37 @@
 
 <script type="text/javascript">
 	var tempName = getCookie("username");
-	var tempArticleData,tempBookData;
-	var tempArticleNumber,tempBookNumber;
+	var tempArticleData, tempBookData;
+	var tempArticleNumber, tempBookNumber;
 	var t;
 
 	Vue.component('book', {
 		template: '#book-template',
 		data: function() {
 			return {
-				book:tempBookData[tempBookNumber],
+				book: tempBookData[tempBookNumber],
+				options: [{
+						  id: '加载中',
+						  bookname: '加载中'
+						}],
+						value4: ''
 			};
 		},
-		methods:{
-			exchange:function(){
+		methods: {
+			exchange: function() {
 
 			}
+		},
+		mounted:function(){
+
+			    this.$http.get("http://xplovesaber.top/bookEx/getUserBook.php?username="+getCookie("username")).then((result) => {
+			    	this.options=eval(result.data);
+			    }, (error) => {
+					this.$message({
+						type: 'error',
+						message: '获取用户书籍失败,请刷新页面！',
+					});
+			    })
 		}
 
 	})
@@ -413,52 +437,57 @@
 				input4: '',
 				input5: '',
 				select: '',
-				banners:[{src:"http://xplovesaber.top/bookEx/img/banner1.jpg"},
-					{src:"http://xplovesaber.top/bookEx/img/banner2.jpg"},
-					{src:"http://xplovesaber.top/bookEx/img/banner3.jpg"},
-					{src:"http://xplovesaber.top/bookEx/img/banner4.jpg"}]
+				banners: [{
+					src: "http://xplovesaber.top/bookEx/img/banner1.jpg"
+				}, {
+					src: "http://xplovesaber.top/bookEx/img/banner2.jpg"
+				}, {
+					src: "http://xplovesaber.top/bookEx/img/banner3.jpg"
+				}, {
+					src: "http://xplovesaber.top/bookEx/img/banner4.jpg"
+				}]
 			};
 		},
 		methods: {
 			toBook: function(index) {
-					tempBookNumber=index;
-					app.content='book';
+				tempBookNumber = index;
+				app.content = 'book';
 			},
-			search:function(){
-					this.fullscreenLoading=true;
-				    this.$http.get("http://xplovesaber.top/bookEx/getBookByName.php?bookname="+this.input5).then((result) => {
-						this.$message({
-							type: 'success',
-							message: '成功获取'
-						});
-				    	this.items=eval(result.data).reverse();
-						tempBookData=eval(result.data).reverse();
-						this.fullscreenLoading=false;
-						var t=setTimeout("recover()",1000);
-						if(items.length==0){
-							this.$message({
-								type: 'error',
-								message: '找不到啦!'
-							});
-						}
-				    }, (error) => {
+			search: function() {
+				this.fullscreenLoading = true;
+				this.$http.get("http://xplovesaber.top/bookEx/getBookByName.php?bookname=" + this.input5).then((result) => {
+					this.$message({
+						type: 'success',
+						message: '成功获取'
+					});
+					this.items = eval(result.data).reverse();
+					tempBookData = eval(result.data).reverse();
+					this.fullscreenLoading = false;
+					var t = setTimeout("recover()", 1000);
+					if (items.length == 0) {
 						this.$message({
 							type: 'error',
-							message: '获取失败'
+							message: '找不到啦!'
 						});
-				    })
+					}
+				}, (error) => {
+					this.$message({
+						type: 'error',
+						message: '获取失败'
+					});
+				})
 			},
-			getA:function(){
-				this.fullscreenLoading=true;
+			getA: function() {
+				this.fullscreenLoading = true;
 				this.$http.get("http://xplovesaber.top/bookEx/getBookByKind.php?kind=古典文学").then((result) => {
 					this.$message({
 						type: 'success',
 						message: '成功获取'
 					});
-					this.items=eval(result.data);
-					this.fullscreenLoading=false;
-					var t=setTimeout("recover()",1000);
-					if(items.length==0){
+					this.items = eval(result.data);
+					this.fullscreenLoading = false;
+					var t = setTimeout("recover()", 1000);
+					if (items.length == 0) {
 						this.$message({
 							type: 'error',
 							message: '找不到啦!'
@@ -471,17 +500,17 @@
 					});
 				})
 			},
-			getB:function(){
-				this.fullscreenLoading=true;
+			getB: function() {
+				this.fullscreenLoading = true;
 				this.$http.get("http://xplovesaber.top/bookEx/getBookByKind.php?kind=科幻小说").then((result) => {
 					this.$message({
 						type: 'success',
 						message: '成功获取'
 					});
-					this.items=eval(result.data);
-					this.fullscreenLoading=false;
-					var t=setTimeout("recover()",1000);
-					if(items.length==0){
+					this.items = eval(result.data);
+					this.fullscreenLoading = false;
+					var t = setTimeout("recover()", 1000);
+					if (items.length == 0) {
 						this.$message({
 							type: 'error',
 							message: '找不到啦!'
@@ -494,17 +523,17 @@
 					});
 				})
 			},
-			getC:function(){
-				this.fullscreenLoading=true;
+			getC: function() {
+				this.fullscreenLoading = true;
 				this.$http.get("http://xplovesaber.top/bookEx/getBookByKind.php?kind=学术期刊").then((result) => {
 					this.$message({
 						type: 'success',
 						message: '成功获取'
 					});
-					this.items=eval(result.data);
-					this.fullscreenLoading=false;
-					var t=setTimeout("recover()",1000);
-					if(items.length==0){
+					this.items = eval(result.data);
+					this.fullscreenLoading = false;
+					var t = setTimeout("recover()", 1000);
+					if (items.length == 0) {
 						this.$message({
 							type: 'error',
 							message: '找不到啦!'
@@ -517,17 +546,17 @@
 					});
 				})
 			},
-			getD:function(){
-				this.fullscreenLoading=true;
+			getD: function() {
+				this.fullscreenLoading = true;
 				this.$http.get("http://xplovesaber.top/bookEx/getBookByKind.php?kind=儿童文学").then((result) => {
 					this.$message({
 						type: 'success',
 						message: '成功获取'
 					});
-					this.items=eval(result.data);
-					this.fullscreenLoading=false;
-					var t=setTimeout("recover()",1000);
-					if(items.length==0){
+					this.items = eval(result.data);
+					this.fullscreenLoading = false;
+					var t = setTimeout("recover()", 1000);
+					if (items.length == 0) {
 						this.$message({
 							type: 'error',
 							message: '找不到啦!'
@@ -540,17 +569,17 @@
 					});
 				})
 			},
-			getE:function(){
-				this.fullscreenLoading=true;
+			getE: function() {
+				this.fullscreenLoading = true;
 				this.$http.get("http://xplovesaber.top/bookEx/getBookByKind.php?kind=教辅资料").then((result) => {
 					this.$message({
 						type: 'success',
 						message: '成功获取'
 					});
-					this.items=eval(result.data);
-					this.fullscreenLoading=false;
-					var t=setTimeout("recover()",1000);
-					if(items.length==0){
+					this.items = eval(result.data);
+					this.fullscreenLoading = false;
+					var t = setTimeout("recover()", 1000);
+					if (items.length == 0) {
 						this.$message({
 							type: 'error',
 							message: '找不到啦!'
@@ -563,17 +592,17 @@
 					});
 				})
 			},
-			getF:function(){
-				this.fullscreenLoading=true;
+			getF: function() {
+				this.fullscreenLoading = true;
 				this.$http.get("http://xplovesaber.top/bookEx/getBookByKind.php?kind=娱乐杂志").then((result) => {
 					this.$message({
 						type: 'success',
 						message: '成功获取'
 					});
-					this.items=eval(result.data);
-					this.fullscreenLoading=false;
-					var t=setTimeout("recover()",1000);
-					if(items.length==0){
+					this.items = eval(result.data);
+					this.fullscreenLoading = false;
+					var t = setTimeout("recover()", 1000);
+					if (items.length == 0) {
 						this.$message({
 							type: 'error',
 							message: '找不到啦!'
@@ -588,20 +617,20 @@
 			}
 		},
 		mounted: function() {
-			    this.$http.get("http://xplovesaber.top/bookEx/getAllBook.php").then((result) => {
+			this.$http.get("http://xplovesaber.top/bookEx/getAllBook.php").then((result) => {
 
-			    	this.items=eval(result.data).reverse();
-					tempBookData=eval(result.data).reverse();
-					var t=setTimeout("recover()",3000);
-			    }, (error) => {
-					this.$message({
-						type: 'error',
-						message: '加载失败'
-					});
-			    })
-				this.$nextTick(function(){
-					var t=setTimeout("recover()",1000);
-				})
+				this.items = eval(result.data).reverse();
+				tempBookData = eval(result.data).reverse();
+				var t = setTimeout("recover()", 3000);
+			}, (error) => {
+				this.$message({
+					type: 'error',
+					message: '加载失败'
+				});
+			})
+			this.$nextTick(function() {
+				var t = setTimeout("recover()", 1000);
+			})
 
 
 		}
@@ -612,7 +641,7 @@
 		data: function() {
 			return {
 				item7s: tempArticleData,
-				input5:'',
+				input5: '',
 			};
 		},
 		methods: {
@@ -620,28 +649,28 @@
 				app.content = 'five';
 				tempArticleNumber = index;
 			},
-			search:function(){
-					this.fullscreenLoading=true;
-				    this.$http.get("http://xplovesaber.top/bookEx/getArticleByName.php?bookname="+this.input5).then((result) => {
-						this.fullscreenLoading=false;
-						this.$message({
-							type: 'success',
-							message: '成功发送评论'
-						});
-				    	this.item7s=eval(result.data);
-						if(item7s.length==0){
-							this.$message({
-								type: 'error',
-								message: '找不到啦!'
-							});
-						}
-				    }, (error) => {
+			search: function() {
+				this.fullscreenLoading = true;
+				this.$http.get("http://xplovesaber.top/bookEx/getArticleByName.php?bookname=" + this.input5).then((result) => {
+					this.fullscreenLoading = false;
+					this.$message({
+						type: 'success',
+						message: '成功发送评论'
+					});
+					this.item7s = eval(result.data);
+					if (item7s.length == 0) {
 						this.$message({
 							type: 'error',
-							message: '搜索失败!'
+							message: '找不到啦!'
 						});
+					}
+				}, (error) => {
+					this.$message({
+						type: 'error',
+						message: '搜索失败!'
+					});
 
-				    })
+				})
 			}
 		}
 
@@ -752,7 +781,7 @@
 		template: '#four-template',
 		data: function() {
 			return {
-				fullscreenLoading:false,
+				fullscreenLoading: false,
 				fileList: [],
 				options: [{
 					value: '古典文学',
@@ -809,29 +838,29 @@
 			handlePreview(file) {
 				console.log(file);
 			},
-			upbook:function(){
-				this.fullscreenLoading=true;
+			upbook: function() {
+				this.fullscreenLoading = true;
 				var formElement = document.getElementById("uploadForm");
-				var d=new FormData(formElement);
-				d.append('username',getCookie('username'));
-				d.append('bookname',this.formOfBook.bookname);
+				var d = new FormData(formElement);
+				d.append('username', getCookie('username'));
+				d.append('bookname', this.formOfBook.bookname);
 				var date1 = new Date(this.formOfBook.date);
-				var	youWant=date1.getFullYear() + '-' + (date1.getMonth() + 1) + '-' + date1.getDate();
-				d.append('buydate',youWant);
-				d.append('kind',this.formOfBook.kind);
-				d.append('wantkind',this.formOfBook.wantkind);
-				d.append('introduction',this.formOfBook.introduction);
-				d.append('date',getNowFormatDate());
-				this.$http.post("http://xplovesaber.top/bookEx/upbook.php",d).then((response) => {
-					this.fullscreenLoading=false;
+				var youWant = date1.getFullYear() + '-' + (date1.getMonth() + 1) + '-' + date1.getDate();
+				d.append('buydate', youWant);
+				d.append('kind', this.formOfBook.kind);
+				d.append('wantkind', this.formOfBook.wantkind);
+				d.append('introduction', this.formOfBook.introduction);
+				d.append('date', getNowFormatDate());
+				this.$http.post("http://xplovesaber.top/bookEx/upbook.php", d).then((response) => {
+					this.fullscreenLoading = false;
 					this.$message({
 						showClose: true,
 						message: "上传成功",
 						type: 'success'
 					});
-					app.content='first';
+					app.content = 'first';
 				}, (error) => {
-					this.fullscreenLoading=false;
+					this.fullscreenLoading = false;
 					this.$message({
 						showClose: true,
 						message: "上传失败",
@@ -946,7 +975,7 @@
 				console.log(key, keyPath);
 				if (key == '1') {
 					this.content = 'first';
-					t=setTimeout("recover()",100);
+					t = setTimeout("recover()", 100);
 				} else if (key == '2') {
 					if (tempArticleData == null) {
 						this.fullscreenLoading = true;
@@ -1023,14 +1052,15 @@
 			seperator2 + date.getSeconds();
 		return currentdate;
 	}
-	function recover(){
 
-			$('#container').BlocksIt({
-				numOfCol: 5,
-				offsetX: 8,
-				offsetY: 8,
-				blockElement: '.grid'
-			});
+	function recover() {
+
+		$('#container').BlocksIt({
+			numOfCol: 5,
+			offsetX: 8,
+			offsetY: 8,
+			blockElement: '.grid'
+		});
 
 
 		//window resize
@@ -1063,9 +1093,9 @@
 			}
 		});
 
-		var $sashimi = $( '.sashimi' );
-		var $nigiri = $( '.nigiri' );
-		var $maki = $( '.maki' );
+		var $sashimi = $('.sashimi');
+		var $nigiri = $('.nigiri');
+		var $maki = $('.maki');
 
 		// Create Makisus
 
@@ -1077,56 +1107,49 @@
 
 		// Open all
 
-		$( '.list' ).makisu( 'open' );
+		$('.list').makisu('open');
 
 
 		// Disable all links
 
-		$( '.demo a' ).click( function( event ) {
+		$('.demo a').click(function(event) {
 			event.preventDefault();
 		});
 		clearTimeout(t);
 	}
 
-	function setImagePreview()
-    {
-            var docObj=document.getElementById("file");
-            var imgObjPreview=document.getElementById("preview");
-            if(docObj.files &&    docObj.files[0])
-            {
-                //火狐下，直接设img属性
-                imgObjPreview.style.display = 'block';
-                imgObjPreview.style.width = '200px';
-                imgObjPreview.style.height = '200px';
-               //imgObjPreview.src = docObj.files[0].getAsDataURL();
-               //火狐7以上版本不能用上面的getAsDataURL()方式获取，需要一下方式
-                imgObjPreview.src = window.URL.createObjectURL(docObj.files[0]);
-            }
-            else
-            {
-                //IE下，使用滤镜
-                docObj.select();
-                var imgSrc = document.selection.createRange().text;
-                var localImagId = document.getElementById("localImag");
-                //必须设置初始大小
-                localImagId.style.width = "300px";
-                localImagId.style.height = "120px";
-                //图片异常的捕捉，防止用户修改后缀来伪造图片
-                try
-                {
-                    localImagId.style.filter="progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)";
-                    localImagId.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = imgSrc;
-                }
-                catch(e)
-                {
-                    alert("您上传的图片格式不正确，请重新选择!");
-                    return false;
-                }
-                    imgObjPreview.style.display = 'none';
-                    document.selection.empty();
-             }
-             return true;
-     }
+	function setImagePreview() {
+		var docObj = document.getElementById("file");
+		var imgObjPreview = document.getElementById("preview");
+		if (docObj.files && docObj.files[0]) {
+			//火狐下，直接设img属性
+			imgObjPreview.style.display = 'block';
+			imgObjPreview.style.width = '200px';
+			imgObjPreview.style.height = '200px';
+			//imgObjPreview.src = docObj.files[0].getAsDataURL();
+			//火狐7以上版本不能用上面的getAsDataURL()方式获取，需要一下方式
+			imgObjPreview.src = window.URL.createObjectURL(docObj.files[0]);
+		} else {
+			//IE下，使用滤镜
+			docObj.select();
+			var imgSrc = document.selection.createRange().text;
+			var localImagId = document.getElementById("localImag");
+			//必须设置初始大小
+			localImagId.style.width = "300px";
+			localImagId.style.height = "120px";
+			//图片异常的捕捉，防止用户修改后缀来伪造图片
+			try {
+				localImagId.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale)";
+				localImagId.filters.item("DXImageTransform.Microsoft.AlphaImageLoader").src = imgSrc;
+			} catch (e) {
+				alert("您上传的图片格式不正确，请重新选择!");
+				return false;
+			}
+			imgObjPreview.style.display = 'none';
+			document.selection.empty();
+		}
+		return true;
+	}
 </script>
 
 
@@ -1161,103 +1184,111 @@
 	}
 
 	.demo:after {
-
-	    box-shadow: 0 1px 16px rgba(0,0,0,0.15);
-	    background: #1b1b1b;
-	    position: absolute;
-	    content: '';
-	    height: 10px;
-	    width: 100%;
-	    top: 0;
+		box-shadow: 0 1px 16px rgba(0, 0, 0, 0.15);
+		background: #1b1b1b;
+		position: absolute;
+		content: '';
+		height: 10px;
+		width: 100%;
+		top: 0;
 	}
-
 	/* List styles */
 
 	.list {
-
-	    -webkit-transform-style: preserve-3d;
-	    -moz-transform-style: preserve-3d;
-	    -ms-transform-style: preserve-3d;
-	    -o-transform-style: preserve-3d;
-	    transform-style: preserve-3d;
-
-	    text-transform: uppercase;
-	    position: absolute;
-	    margin-left: -140px;
-	    margin-top: -280px;
-	    top: 55%;
+		-webkit-transform-style: preserve-3d;
+		-moz-transform-style: preserve-3d;
+		-ms-transform-style: preserve-3d;
+		-o-transform-style: preserve-3d;
+		transform-style: preserve-3d;
+		text-transform: uppercase;
+		position: absolute;
+		margin-left: -140px;
+		margin-top: -280px;
+		top: 55%;
 	}
 
 	.list a {
-
-	    display: block;
-	    color: #fff;
+		display: block;
+		color: #fff;
 	}
 
 	.list a:hover {
-	    text-indent: 20px;
+		text-indent: 20px;
 	}
 
-	.list dt, .list dd {
-
-	    text-indent: 10px;
-	    line-height: 55px;
-	    background: #E0FBAC;
-	    margin: 0;
-	    height: 55px;
-	    width: 370px;
-	    color: #fff;
+	.list dt,
+	.list dd {
+		text-indent: 10px;
+		line-height: 55px;
+		background: #E0FBAC;
+		margin: 0;
+		height: 55px;
+		width: 370px;
+		color: #fff;
 	}
 
 	.list dt {
-
-	    /* Since we're hiding elements behind here, we need it in 3d */
-	    -webkit-transform: translateZ(0.3px);
-	    -moz-transform: translateZ(0.3px);
-	    -ms-transform: translateZ(0.3px);
-	    -o-transform: translateZ(0.3px);
-	    transform: translateZ(0.3px);
-
-	    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-	    font-size: 15px;
+		/* Since we're hiding elements behind here, we need it in 3d */
+		-webkit-transform: translateZ(0.3px);
+		-moz-transform: translateZ(0.3px);
+		-ms-transform: translateZ(0.3px);
+		-o-transform: translateZ(0.3px);
+		transform: translateZ(0.3px);
+		text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+		font-size: 15px;
 	}
 
 	.list dd {
-
-	    border-top: 1px dashed rgba(255,255,255,0.3);
-	    line-height: 35px;
-	    font-size: 18px;
-	    height: 35px;
-	    margin: 0;
+		border-top: 1px dashed rgba(255, 255, 255, 0.3);
+		line-height: 35px;
+		font-size: 18px;
+		height: 35px;
+		margin: 0;
 	}
-
-
-
 	/* Individual styles */
 
-	.sashimi dt, .sashimi dd, .sashimi a { background: #73C8A9; }
-	.nigiri dt, .nigiri dd, .nigiri a { background: #E32551; }
-	.maki dt, .maki dd, .maki a { background: #FFC219; }
+	.sashimi dt,
+	.sashimi dd,
+	.sashimi a {
+		background: #73C8A9;
+	}
 
-	.sashimi a:hover { background: #61c19e; }
-	.nigiri a:hover { background: #d31b46; }
-	.maki a:hover { background: #ffbb00; }
+	.nigiri dt,
+	.nigiri dd,
+	.nigiri a {
+		background: #E32551;
+	}
+
+	.maki dt,
+	.maki dd,
+	.maki a {
+		background: #FFC219;
+	}
+
+	.sashimi a:hover {
+		background: #61c19e;
+	}
+
+	.nigiri a:hover {
+		background: #d31b46;
+	}
+
+	.maki a:hover {
+		background: #ffbb00;
+	}
 
 	.sashimi {
-
-	    -webkit-transform: perspective(1200px) rotateY(-40deg) !important;
-	    -moz-transform: perspective(1200px) rotateY(-40deg) !important;
-	    -ms-transform: perspective(1200px) rotateY(-40deg) !important;
-	    -o-transform: perspective(1200px) rotateY(-40deg) !important;
-	    transform: perspective(1200px) rotateY(-40deg) !important;
-
-	    -webkit-transform-origin: -10% 25%;
-	    -moz-transform-origin: -10% 25%;
-	    -ms-transform-origin: -10% 25%;
-	    -o-transform-origin: -10% 25%;
-	    transform-origin: -10% 25%;
-
-	    left: 80%;
+		-webkit-transform: perspective(1200px) rotateY(-40deg) !important;
+		-moz-transform: perspective(1200px) rotateY(-40deg) !important;
+		-ms-transform: perspective(1200px) rotateY(-40deg) !important;
+		-o-transform: perspective(1200px) rotateY(-40deg) !important;
+		transform: perspective(1200px) rotateY(-40deg) !important;
+		-webkit-transform-origin: -10% 25%;
+		-moz-transform-origin: -10% 25%;
+		-ms-transform-origin: -10% 25%;
+		-o-transform-origin: -10% 25%;
+		transform-origin: -10% 25%;
+		left: 80%;
 	}
 </style>
 
