@@ -347,7 +347,22 @@
                     })
                 },
                 refuse:function(){
-
+                    this.fullscreenLoading=true;
+                    this.$http.get("http://xplovesaber.top/bookEx/setExchange2.php?id="+tempExchangeData[index]['id']).then((result) => {
+                        this.fullscreenLoading=false;
+                        this.$notify({
+                            title: '成功',
+                            message: '拒绝交换',
+                            type: 'success'
+                        });
+                    }, (error) => {
+                        this.fullscreenLoading=false;
+                        this.$notify({
+                            title: '失败',
+                            message: '向服务器请求失败',
+                            type: 'error'
+                        });
+                    })
                 }
         },
         mounted:function(){
