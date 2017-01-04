@@ -103,13 +103,13 @@
                         </el-card>
                     </el-col>
                     <el-col :span="4" :offset="1"style="margin-top:65px">
-                            <el-button type="primary" v-if=!(changedbook.usernamea==username) @click="agree(index)">同意</el-button>
-                            <el-button type="danger" v-if=!(changedbook.usernamea==username) @click="refuse">拒绝</el-button>
-                            <el-button type="primary" v-if=(changedbook.status=='1') @click="send">发布物流</el-button>
-                            <el-button type="primary" v-if=(changedbook.status=='2') @click="recevie">确认收货</el-button>
+                            <el-button type="primary" v-if=!(changedbook.usernamea==username)&&changedbook.status==0 @click="agree(index)">同意</el-button>
+                            <el-button type="danger" v-if=!(changedbook.usernamea==username)&&changedbook.status==0 @click="refuse">拒绝</el-button>
+                            <el-button type="primary" v-if=(changedbook.status==1) @click="send">发布物流</el-button>
+                            <el-button type="primary" v-if=(changedbook.status==2) @click="recevie">确认收货</el-button>
                     </el-col>
                     <el-col :span="4" style="margin-top:50px">
-                        <el-steps :space="100" :active="changedbook.status" finish-status="success">
+                        <el-steps :space="100" :active=changedbook.status finish-status="success">
                           <el-step title="待双方同意"></el-step>
                           <el-step title="物流"></el-step>
                           <el-step title="互评"></el-step>
@@ -303,7 +303,7 @@
         mounted: function(){
                 this.$http.get("http://xplovesaber.top/bookEx/getUserArticle.php?username="+getCookie('username')).then((result) => {
                         this.mycomments=eval(result.data).reverse();
-                        tempExchangeData=eval(result.data).reverse();
+
                 }, (error) => {
                         alert("fail!")
                 })
@@ -329,7 +329,7 @@
         methods: {
                 agree:function(index){
                     this.fullscreenLoading=true;
-                    this.$http.get("http://xplovesaber.top/bookEx/setExchange.php?id="+tempExchangeData[index]['id']+"&&bookid="+tempExchangeData[index]['bookidb']).then((result) => {
+                    this.$http.get("http://xplovesaber.top/bookEx/setExchange.php?id="+tempExchangeData[index]['id']+"&&bookid="+tempExchangeData[index]['bookidb']+"&&ida="+tempExchangeData[index]['bookida']+"&&idb="+tempExchangeData[index]['bookidb']).then((result) => {
                         this.fullscreenLoading=false;
                         this.$notify({
                             title: '成功',
@@ -368,12 +368,13 @@
 
                 },
                 recevie:function(){
-                    
+
                 }
         },
         mounted:function(){
                 this.$http.get("http://xplovesaber.top/bookEx/getExchange.php?username="+tempName).then((result) => {
-                        this.changedbooks=eval(result.data);
+                        this.changedbooks=eval(result.data).reverse();
+                        tempExchangeData=eval(result.data).reverse();
                 }, (error) => {
                     this.$notify({
                         title: '失败',
