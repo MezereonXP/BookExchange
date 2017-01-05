@@ -57,11 +57,12 @@
 				<component :is="loginInfo" transition-mode="out-in"></component>
 				<el-col>
 		</el-row>
-		<el-menu :default-active="index" class="el-menu-demo" mode="horizontal" @select="handleSelect" style="margin-left:-10px" v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="书评加载中,请稍等...">
+		<el-menu :default-active="index" class="el-menu-demo" mode="horizontal" @select="handleSelect" style="margin-left:-10px" v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="加载中,请稍等...">
 			<el-menu-item index="1" style="margin-left: 185px">首页</el-menu-item>
 			<el-menu-item index="2">书评</el-menu-item>
 			<el-menu-item index="3">讨论区</el-menu-item>
 			<el-menu-item index="4">书籍发布</el-menu-item>
+			<el-menu-item index="5" :style={visibility:(username==null?'hidden':'visible')}>发布书评</el-menu-item>
 
 		</el-menu>
 		<br/>
@@ -92,7 +93,7 @@
 	</el-col>
 	<el-col :span="12">
 
-				<dl class="list sashimi" style="margin-top:-180px;margin-left:-260px">
+				<dl class="list sashimi" style="margin-top:-180px;margin-left:-230px">
 					<dt style="font-size:20px">分类查询</dt>
 					<dd><a href="#" @click="getA">古典文学</a></dd>
 					<dd><a href="#" @click="getB">科幻小说</a></dd>
@@ -126,13 +127,13 @@
 	<transition name="fade">
 		<div>
 		<el-row>
-			<el-input placeholder="请输入书名或者关键字查找书评" v-model="input5" style="width: 640px;margin-left:430px">
+			<el-input placeholder="请输入书名或者关键字查找书评" v-model="input5" style="width: 640px;margin-left:370px">
 				<el-button slot="append" icon="search" @click="search"></el-button>
 			</el-input>
 		</el-row>
 		<br>
 		<el-row>
-			<el-card class="box-card" v-for="(item7,index) in item7s" style="width:800px;margin-bottom: 10px;margin-left:350px">
+			<el-card class="box-card" v-for="(item7,index) in item7s" style="width:800px;margin-bottom: 10px;margin-left:300px">
 				<el-row>
 					<el-col :span="4">
 						<el-card class="box-card" style="margin-bottom: 2px; width:110px;height:150px;">
@@ -162,23 +163,31 @@
 	<template id="third-template">
 	<transition name="fade">
 		<div>
-			<p style="margin-top:-15px;margin-left:100px;font-size:20px;color:#FFFFFF">站内帖子</p>
+			<p style="margin-top:-15px;margin-left:100px;font-size:20px;">站内帖子</p>
 			<p style="margin-top: -30px">______________________________________________________________________________________________________________________________________________________________________________________________________________________________</p>
 			<el-row>
-				<el-card class="box-card" v-for="comment in comments" style="width:1200px;margin-bottom: 10px;margin-left:150px">
+				<el-input placeholder="请输入关键字查找帖子" v-model="input5" style="width: 640px;margin-left:400px">
+					<el-button slot="append" icon="search" @click="search"></el-button>
+				</el-input>
+			</el-row>
+			<br>
+			<el-row>
+				<el-card class="box-card" v-for="(comment,index) in forums" style="width:900px;margin-bottom: 10px;margin-left:250px">
 					<el-row>
-						<el-col :span="4">
-							<div style="width:120px; height:120px; border-radius:50%; overflow:hidden;">
-								<img :src="comment.src" style="width:120px;height:120px"></img>
+						<el-col :span="2" >
+							<div style="width:60px; height:60px; border-radius:50%; overflow:hidden;margin-left:-5px">
+								<img :src="comment.src" style="width:60px;height:60px"></img>
 							</div>
-							&nbsp;&nbsp;{{comment.username}}
+							 &nbsp;&nbsp;{{comment.username}}
 						</el-col>
-						<el-col :span="10">
-							<h2 style="margin-top:10px">{{comment.bookname}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h2>
+						<el-col :span="9" style="margin-left:35px">
+							<a style="margin-top:10px;font-size:18px;width:500px" href="#" @click="toForum(index)">{{comment.title}} </a>
+							<br/>
+							<br/>
 							概述：
-							<div style="height:74px;width:500px;word-wrap:break-word;overflow:hidden;text-overflow: ellipsis;margin-buttom:8px;font-size:14px">{{comment.introduction}}</div>
+							<div style="height:74px;width:500px;word-wrap:break-word;overflow:hidden;text-overflow: ellipsis;margin-buttom:8px;font-size:14px" v-html=comment.introduction></div>
 						</el-col>
-						<el-col :span="6" :offset="19" style="margin-top:-35px">
+						<el-col :span="6" :offset="6" style="margin-top:105px">
 							 <p>{{comment.time}}</p>
 						</el-col>
 					</el-row>
@@ -196,10 +205,10 @@
 			<br>
 			<br>
 			<el-row>
-				<el-col :span="6" :offset="3">
+				<el-col :span="6" :offset="1">
 					<form id="uploadForm"  method="post" enctype="multipart/form-data">
 						<label for="file">图书照片:</label>
-						<input type="file" name="file" id="file" onchange="javascript:setImagePreview();">
+						<input type="file" name="file" id="file" onchange="javascript:setImagePreview();" :value="pic">
 						<div id="localImag"><img id="preview" width=-1 height=-1 style="diplay:none" /></div>
 						<br>
 					</form>
@@ -231,7 +240,7 @@
 						</el-form>
 				</el-col>
 				<el-col :span="5" :offset="1">
-						<el-button type="primary" @click="upbook" style="width:300px;height:90px;margin-top:70px;font-size:40px">确定发布</el-button>
+						<el-button type="primary" @click="upbook" style="width:300px;height:90px;margin-top:70px;font-size:40px" :disabled=!(formOfBook.introduction!=''&&formOfBook.wantkind!=''&&formOfBook.kind!=''&&formOfBook.date!=''&&formOfBook.bookname!='') >确定发布</el-button>
 				</el-col>
 			</el-row>
 		</div>
@@ -342,6 +351,67 @@
 	</transition>
 	</template>
 
+
+	<template id="six-template">
+	<transition name="fade">
+			<div>
+				<el-row style=" margin-top: 20px">
+					<el-card style="width:1200px;margin-left:150px">
+					<el-col :span="14" offset="2">
+						<el-card>
+						<h2>{{articles[index]['title']}}</h2>
+						<br>
+						<div style=" position: relative;">
+							<el-row>
+								<el-col :span="2">
+									<div style="width:48px; height:48px; border-radius:50%; overflow:hidden;">
+										<img width="48px" height="48px" :src=articles[index]['src']>
+									</div>
+								</el-col>
+								<el-col :span="6" :offset="1" style="margin-top:12px">
+									<span>{{articles[index]['username']}}</span>
+								</el-col>
+								<el-col :span="4" :offset="9">
+									<span style=" margin-left: 60px; font-size: 12px; position:absolute;right:5; bottom: 0">{{articles[index]['time']}}</span>
+									<el-col>
+							</el-row>
+						</div>
+						<br>
+						<el-card>
+						<div v-html=articles[index]['introduction']></div>
+						</el-card>
+						<br>
+						<br>
+						<br> 评论区
+						<br>
+						<br>
+						<div v-for="mycomment in comments">
+						<el-card>
+						<div style=" position: relative; margin-left: 60px; ">
+
+
+							<img   width="48" height="48" :src=mycomment.src style=" margin-left: -60px">
+							<span style=" position:absolute;top:0;">{{mycomment.username}}&nbsp;&nbsp;&nbsp;</span>
+							<span v-html=mycomment.comment></span>
+							<span style=" position:absolute;top:0;right:0;font-size: 12px; color:#475669">{{mycomment.time}}</span>
+
+						</div>
+						</el-card>
+						<br>
+						</div>
+						<br>
+						<template>
+					  <el-button type="text" @click="open3" style="color:#1F2D3D; font-size: 20px"><strong>>我来回应</strong></el-button>
+					</template>
+
+	</el-col>
+	</el-card>
+	</el-row>
+
+	</div>
+	</transition>
+	</template>
+
 	<template id="book-template">
 	<transition name="fade">
 		<el-row v-loading.fullscreen.lock="fullscreenLoading"element-loading-text="申请交换中,请稍等...">
@@ -382,15 +452,100 @@
 	</transition>
 </template>
 
+<template id="sendArticle-template">
+<transition name="fade">
+	<div v-loading.fullscreen.lock="fullscreenLoading"element-loading-text="上传书评中,请稍等...">
+		<br>
+		<br>
+		<br>
+		<el-row>
+			<el-col :span="6" :offset="1">
+				<form id="uploadForm"  method="post" enctype="multipart/form-data">
+					<label for="file">图书照片:</label>
+					<input type="file" name="file" id="file" onchange="javascript:setImagePreview();" :value="pic">
+					<div id="localImag"><img id="preview" width=-1 height=-1 style="diplay:none" /></div>
+					<br>
+				</form>
+			</el-col>
+			<el-col :span="8" :offset="1">
+					<el-form :model="formOfBook" label-position="left" label-width="90px">
+						<el-form-item label="题目">
+							<el-input v-model="formOfBook.title" style="width:220px"></el-input>
+						</el-form-item>
+						<el-form-item label="书名">
+							<el-input v-model="formOfBook.bookname" style="width:220px"></el-input>
+						</el-form-item>
+						<el-form-item label="书评内容" >
+							<el-input type="textarea" v-model="formOfBook.introduction" rows="20"></el-input>
+						</el-form-item>
+					</el-form>
+			</el-col>
+			<el-col :span="5" :offset="1">
+					<el-button type="primary" @click="upbook" style="width:300px;height:90px;margin-top:70px;font-size:40px" :disabled=!(formOfBook.introduction!=''&&formOfBook.bookname!='') >确定发布</el-button>
+			</el-col>
+		</el-row>
+
+	</div>
+
+</transition>
+</template>
+
 
 </body>
 <script src="/BookExchange/js/makisu.js"></script>
 
 <script type="text/javascript">
 	var tempName = getCookie("username");
-	var tempArticleData, tempBookData;
-	var tempArticleNumber, tempBookNumber;
+	var tempArticleData, tempBookData,tempForumData;
+	var tempArticleNumber, tempBookNumber,tempForumNumber;
 	var t;
+
+	Vue.component('sendArticle', {
+		template: '#sendArticle-template',
+		data: function() {
+			return {
+			    fullscreenLoading:false,
+				formOfBook: {
+					bookname: '',
+					introduction: '',
+					title:'',
+				}
+			};
+		},
+		methods:{
+			upbook: function() {
+				this.fullscreenLoading = true;
+				var formElement = document.getElementById("uploadForm");
+				var d = new FormData(formElement);
+				d.append('username', getCookie('username'));
+				d.append('bookname', this.formOfBook.bookname);
+				var date1 = new Date(this.formOfBook.date);
+				var youWant = date1.getFullYear() + '-' + (date1.getMonth() + 1) + '-' + date1.getDate();
+				d.append('introduction', this.formOfBook.introduction);
+				d.append('date', getNowFormatDate());
+				d.append('authorpic',getCookie('userpic'));
+				d.append('title',this.formOfBook.title);
+				this.$http.post("http://xplovesaber.top/bookEx/uparticle.php", d).then((response) => {
+					this.fullscreenLoading = false;
+					this.$message({
+						showClose: true,
+						message: "上传成功",
+						type: 'success'
+					});
+					app.content = 'first';
+				}, (error) => {
+					this.fullscreenLoading = false;
+					this.$message({
+						showClose: true,
+						message: "上传失败",
+						type: 'error'
+					});
+				})
+			}
+		}
+
+	})
+
 
 	Vue.component('book', {
 		template: '#book-template',
@@ -747,48 +902,83 @@
 
 	})
 
+	Vue.component('six', {
+   		template: '#six-template',
+   		data: function() {
+   			return {
+   				articles: tempForumData,
+   				index: tempForumNumber,
+   				comments: [],
+   			};
+   		},
+   		methods: {
+   			open3() {
+   				this.$prompt('你相对这篇帖子要说的', '评论', {
+   					confirmButtonText: '确定',
+   					cancelButtonText: '取消',
+   					//inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
+   					//inputErrorMessage: '邮箱格式不正确'
+   				}).then(({
+   					value
+   				}) => {
+   					var temptime = getNowFormatDate();
+   					this.$http.get("http://xplovesaber.top/bookEx/addForumComment.php?username=" + getCookie('username') + "&&comment=" + value + "&&articleid=" + tempForumData[tempForumNumber]['id'] + "&&time=" + temptime).then((result) => {
+   						this.$message({
+   							type: 'success',
+   							message: '成功发送评论'
+   						});
+   						this.comments.unshift({
+   							'username': getCookie('username'),
+   							'comment': value,
+   							'articleid': tempForumData[tempForumNumber]['id'],
+   							'time': temptime,
+							'src':getCookie('userpic'),
+   						})
+   					}, (error) => {
+   						this.$message({
+   							type: 'error',
+   							message: '发送评论失败'
+   						});
+   					})
+
+   				}).catch(() => {
+   					this.$message({
+   						type: 'info',
+   						message: '取消评论'
+   					});
+   				});
+   			}
+   		},
+   		mounted: function() {
+				    this.$http.get('http://xplovesaber.top/bookEx/getForumComment.php?id=' + tempForumData[tempForumNumber]['id']).then((result) => {
+				    		this.comments=eval(result.data).reverse();
+				    }, (error) => {
+						this.$message({
+							type: 'error',
+							message: '获取评论失败'
+						});
+				    })
+   		}
+
+   	})
+
+
 	Vue.component('third', {
 		template: '#third-template',
 		data: function() {
 			return {
-				comments: [{
-					bookname: 'Foo',
-					username: 'MezereonXP',
-					introduction: "SaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaber",
-					src: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
-					time: "2016年12月30日18:58:24"
-				}, {
-					bookname: 'Foo',
-					username: 'MezereonXP',
-					introduction: "SaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaber",
-					src: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
-					time: "2016年12月30日18:58:24"
-				}, {
-					bookname: 'Foo',
-					username: 'MezereonXP',
-					introduction: "SaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaber",
-					src: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
-					time: "2016年12月30日18:58:24"
-				}, {
-					bookname: 'Foo',
-					username: 'MezereonXP',
-					introduction: "SaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaber",
-					src: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
-					time: "2016年12月30日18:58:24"
-				}, {
-					bookname: 'Foo',
-					username: 'MezereonXP',
-					introduction: "SaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaber",
-					src: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
-					time: "2016年12月30日18:58:24"
-				}, {
-					bookname: 'Foo',
-					username: 'MezereonXP',
-					introduction: "SaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaberSaber",
-					src: "http://img4.duitang.com/uploads/item/201501/09/20150109182811_2ZiB2.thumb.700_0.jpeg",
-					time: "2016年12月30日18:58:24"
-				}]
+				input5: '',
+				forums: tempForumData,
 			};
+		},
+		methods:{
+			toForum:function(index){
+				app.content = 'six';
+				tempForumNumber = index;
+			},
+			search:function(){
+
+			}
 		}
 
 	})
@@ -796,6 +986,7 @@
 		template: '#four-template',
 		data: function() {
 			return {
+				pic:'',
 				fullscreenLoading: false,
 				fileList: [],
 				options: [{
@@ -902,6 +1093,7 @@
 				delCookie('signatrue');
 				delCookie('userpic');
 				tempName = null;
+				app.username=null;
 				app.loginInfo = 'login';
 				app.content = 'first';
 				app.index = '1';
@@ -947,6 +1139,7 @@
 								setCookie("username", userdata[0]['username']);
 								setCookie('signatrue', userdata[0]['signatrue']);
 								setCookie('userpic', userdata[0]['src']);
+								app.username=getCookie('username');
 								app.loginInfo = 'havelogin';
 							} else {
 								this.fullscreenLoading = false;
@@ -983,6 +1176,7 @@
 			content: 'first',
 			bookData: ["saber", "archer", "caster"],
 			index: '1',
+			username:tempName,
 			fullscreenLoading: false,
 		},
 		methods: {
@@ -998,7 +1192,7 @@
 						this.$http.get(url)
 							.then((response) => {
 								this.fullscreenLoading = false;
-								tempArticleData = eval(response.data);
+								tempArticleData = eval(response.data).reverse();
 								this.content = 'second';
 							}, (error) => {
 								this.fullscreenLoading = false;
@@ -1013,7 +1207,25 @@
 						this.content = 'second';
 					}
 				} else if (key == '3') {
-					this.content = 'third';
+					if (tempForumData == null) {
+						this.fullscreenLoading = true;
+						this.$http.get('http://xplovesaber.top/bookEx/getForumInfo.php').then((result) => {
+							this.fullscreenLoading = false;
+							tempForumData = eval(result.data).reverse();
+							this.content = 'third';
+							}, (error) => {
+							this.fullscreenLoading = false;
+							this.$message({
+								showClose: true,
+								message: "获取失败",
+								type: 'error'
+							});
+						});
+
+					}else{
+						this.content = 'third';
+					}
+
 				} else if (key == '4') {
 					if (tempName != null) {
 						this.content = 'four';
@@ -1021,6 +1233,8 @@
 						window.location.href = "/BookExchange/register.html"
 					}
 
+				}else if(key=='5'){
+						this.content='sendArticle';
 				}
 			}
 		}
