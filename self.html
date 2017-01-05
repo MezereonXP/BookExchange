@@ -42,10 +42,11 @@
             </center>
             <p style="margin-left:600px;font-size:14px;display:inline;color:#FFFFFF">个人签名：</p>
             <textarea cols="34 " rows="4 " style="color:#FFFFFF;resize:none;margin-top:-18px;margin-left:670px;background:transparent;border-style:none;font-size:12px" disabled=true>{{user.signatrue}}</textarea>
+            <a href="#" style="color:#000000" @click="changeSign"><i class="el-icon-edit"></i></a>
         </el-row>
         <el-row>
             <el-menu theme="dark" default-active="1" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-                <el-menu-item style="margin-left:450px" index="1">我的书评</el-menu-item>
+                <el-menu-item style="margin-left:370px" index="1">我的书评</el-menu-item>
                 <el-menu-item index="2">交换请求</el-menu-item>
                 <el-menu-item index="3">待交换书籍</el-menu-item>
                 <el-menu-item index="4">发布书籍</el-menu-item>
@@ -150,49 +151,50 @@
     </template>
     <template id="upBook-template">
         <transition name="fade">
-            <div>
-                <br>
-                <br>
-                <br>
-                <el-row>
-                    <el-col :span="6" :offset="3">
-                        <el-upload action="//jsonplaceholder.typicode.com/posts/" type="drag" :thumbnail-mode="true" :on-preview="handlePreview" :on-remove="handleRemove" :default-file-list="fileList">
-                        <i class="el-icon-upload"></i>
-                        <div class="el-dragger__text">将文件拖到此处，或<em>点击上传</em></div>
-                        <div class="el-upload__tip" slot="tip"style="color:#000000">只能上传jpg/png文件，且不超过500kb</div>
-                        </el-upload>
-                    </el-col>
-                    <el-col :span="8" :offset="1">
-                            <el-form :model="formOfBook" label-position="left" label-width="90px">
-                                <el-form-item label="书名">
-                                    <el-input v-model="formOfBook.bookname" style="width:220px"></el-input>
-                                </el-form-item>
-                                <el-form-item label="购买日期">
-                                        <el-date-picker style="width:220px"v-model="formOfBook.date" type="date" placeholder="选择日期" :picker-options="pickerOptions0">
-                                        </el-date-picker>
-                                </el-form-item>
-                                <el-form-item label="书籍类型">
-                                        <el-select v-model="formOfBook.kind" placeholder="请选择">
-                                            <el-option v-for="item in options" :label="item.label" :value="item.value">
-                                            </el-option>
-                                        </el-select>
-                                </el-form-item>
-                                <el-form-item label="想要的类型">
-                                        <el-select v-model="formOfBook.wantkind" placeholder="请选择">
-                                            <el-option v-for="item in options2" :label="item.label" :value="item.value">
-                                            </el-option>
-                                        </el-select>
-                                </el-form-item>
-                                <el-form-item label="书本简介" >
-                                    <el-input type="textarea" v-model="formOfBook.introduction" rows="5"></el-input>
-                                </el-form-item>
-                            </el-form>
-                    </el-col>
-                    <el-col :span="5" :offset="1">
-                            <el-button type="primary" style="width:300px;height:90px;margin-top:70px;font-size:40px" :disabled=!(formOfBook.bookname!=''&&formOfBook.kind!=''&&formOfBook.wantkind!=''&&formOfBook.introduction!=''&&formOfBook.date!='')>确定发布</el-button>
-                    </el-col>
-                </el-row>
-            </div>
+            <div v-loading.fullscreen.lock="fullscreenLoading"element-loading-text="上传中,请稍等...">
+    			<br>
+    			<br>
+    			<br>
+    			<el-row>
+    				<el-col :span="6" :offset="1">
+    					<form id="uploadForm"  method="post" enctype="multipart/form-data">
+    						<label for="file">图书照片:</label>
+    						<input type="file" name="file" id="file" onchange="javascript:setImagePreview();" :value="pic">
+    						<div id="localImag"><img id="preview" width=-1 height=-1 style="diplay:none" /></div>
+    						<br>
+    					</form>
+    				</el-col>
+    				<el-col :span="8" :offset="1">
+    						<el-form :model="formOfBook" label-position="left" label-width="90px">
+    							<el-form-item label="书名">
+    								<el-input v-model="formOfBook.bookname" style="width:220px"></el-input>
+    							</el-form-item>
+    							<el-form-item label="购买日期">
+    									<el-date-picker style="width:220px" v-model="formOfBook.date" type="date" placeholder="选择日期" :picker-options="pickerOptions0">
+    									</el-date-picker>
+    							</el-form-item>
+    							<el-form-item label="书籍类型">
+    									<el-select v-model="formOfBook.kind" placeholder="请选择">
+    										<el-option v-for="item in options" :label="item.label" :value="item.value">
+    										</el-option>
+    									</el-select>
+    							</el-form-item>
+    							<el-form-item label="想要的类型">
+    									<el-select v-model="formOfBook.wantkind" placeholder="请选择">
+    										<el-option v-for="item in options2" :label="item.label" :value="item.value">
+    										</el-option>
+    									</el-select>
+    							</el-form-item>
+    							<el-form-item label="书本简介" >
+    								<el-input type="textarea" v-model="formOfBook.introduction" rows="5"></el-input>
+    							</el-form-item>
+    						</el-form>
+    				</el-col>
+    				<el-col :span="5" :offset="1">
+    						<el-button type="primary" @click="upbook" style="width:300px;height:90px;margin-top:70px;font-size:40px" :disabled=!(formOfBook.introduction!=''&&formOfBook.wantkind!=''&&formOfBook.kind!=''&&formOfBook.date!=''&&formOfBook.bookname!='') >确定发布</el-button>
+    				</el-col>
+    			</el-row>
+    		</div>
         </transition>
     </template>
     <template id="info-template">
@@ -488,18 +490,96 @@
     Vue.component('upBook', {
         template: '#upBook-template',
         data: function() {
-            return {
-                fileList:[],
-                options: [{ value: '选项1', label: '古典文学' }, { value: '选项2', label: '科幻小说' }, { value: '选项3', label: '学术期刊' }, { value: '选项4', label: '儿童文学' }, { value: '选项5', label: '教辅资料' },{ value: '选项6', label:'娱乐杂志' }],
-                options2: [{ value: '选项1', label: '古典文学' }, { value: '选项2', label: '科幻小说' }, { value: '选项3', label: '学术期刊' }, { value: '选项4', label: '儿童文学' }, { value: '选项5', label: '教辅资料' },{ value: '选项6', label:'娱乐杂志' }],
-                value: '',
-                formOfBook: { bookname: '', date: '', kind: '',wantkind:'',introduction:'' }
-            };
-        },
-        methods:{
-                 handleRemove(file, fileList) { console.log(file, fileList); },
-                 handlePreview(file) { console.log(file); }
-        }
+			return {
+				pic:'',
+				fullscreenLoading: false,
+				fileList: [],
+				options: [{
+					value: '古典文学',
+					label: '古典文学'
+				}, {
+					value: '科幻小说',
+					label: '科幻小说'
+				}, {
+					value: '学术期刊',
+					label: '学术期刊'
+				}, {
+					value: '儿童文学',
+					label: '儿童文学'
+				}, {
+					value: '教辅资料',
+					label: '教辅资料'
+				}, {
+					value: '娱乐杂志',
+					label: '娱乐杂志'
+				}],
+				options2: [{
+					value: '古典文学',
+					label: '古典文学'
+				}, {
+					value: '科幻小说',
+					label: '科幻小说'
+				}, {
+					value: '学术期刊',
+					label: '学术期刊'
+				}, {
+					value: '儿童文学',
+					label: '儿童文学'
+				}, {
+					value: '教辅资料',
+					label: '教辅资料'
+				}, {
+					value: '娱乐杂志',
+					label: '娱乐杂志'
+				}],
+				value: '',
+				formOfBook: {
+					bookname: '',
+					date: '',
+					kind: '',
+					wantkind: '',
+					introduction: ''
+				}
+			};
+		},
+		methods: {
+			handleRemove(file, fileList) {
+				console.log(file, fileList);
+			},
+			handlePreview(file) {
+				console.log(file);
+			},
+			upbook: function() {
+				this.fullscreenLoading = true;
+				var formElement = document.getElementById("uploadForm");
+				var d = new FormData(formElement);
+				d.append('username', getCookie('username'));
+				d.append('bookname', this.formOfBook.bookname);
+				var date1 = new Date(this.formOfBook.date);
+				var youWant = date1.getFullYear() + '-' + (date1.getMonth() + 1) + '-' + date1.getDate();
+				d.append('buydate', youWant);
+				d.append('kind', this.formOfBook.kind);
+				d.append('wantkind', this.formOfBook.wantkind);
+				d.append('introduction', this.formOfBook.introduction);
+				d.append('date', getNowFormatDate());
+				this.$http.post("http://xplovesaber.top/bookEx/upbook.php", d).then((response) => {
+					this.fullscreenLoading = false;
+					this.$message({
+						showClose: true,
+						message: "上传成功",
+						type: 'success'
+					});
+					app.content = 'first';
+				}, (error) => {
+					this.fullscreenLoading = false;
+					this.$message({
+						showClose: true,
+						message: "上传失败",
+						type: 'error'
+					});
+				})
+			}
+		}
 
     })
     Vue.component('info', {
@@ -560,6 +640,33 @@
             content: 'selfcomment',
         },
         methods: {
+            changeSign:function(){
+                this.$prompt('请输入个性签名', '提示', {
+                          confirmButtonText: '确定',
+                          cancelButtonText: '取消',
+                        }).then(({ value }) => {
+
+                                this.$http.get("http://xplovesaber.top/bookEx/changeSign.php?username="+tempName+"&&sign="+value).then((result) => {
+                                    this.$message({
+                                      type: 'success',
+                                      message: '修改成功',
+                                    });
+                                    setCookie('signatrue',value);
+                                    this.user.signatrue=value;
+                                }, (error) => {
+                                    this.$message({
+                                      type: 'error',
+                                      message: '修改失败',
+                                    });
+                                })
+
+                        }).catch(() => {
+                          this.$message({
+                            type: 'info',
+                            message: '取消输入'
+                          });
+                        });
+            },
             handleSelect(key, keyPath) {
                 switch (parseInt(key)) {
                     case 1:
