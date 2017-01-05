@@ -105,13 +105,13 @@
                     <el-col :span="4" :offset="1"style="margin-top:65px">
                             <el-button type="primary" v-if=!(changedbook.usernamea==username)&&changedbook.status==0 @click="agree(index)">同意</el-button>
                             <el-button type="danger" v-if=!(changedbook.usernamea==username)&&changedbook.status==0 @click="refuse">拒绝</el-button>
-                            <el-button type="primary" v-if=(changedbook.status==1&&(((changedbook.usernamea==username)&&(changedbook.numberb==''))||((changedbook.usernamea!=username)&&(changedbook.numbera=='')))) @click="send(index)">发布物流</el-button>
+                            <el-button type="primary" v-if=(changedbook.status==1&&(((changedbook.usernamea==username)&&(changedbook.numberb==' '))||((changedbook.usernamea!=username)&&(changedbook.numbera==' ')))) @click="send(index)">发布物流</el-button>
                             <el-button type="primary" v-if=(changedbook.status==2)&&(((changedbook.usernamea==username)&&(changedbook.numbera!='1'))||((changedbook.usernamea!=username)&&(changedbook.numberb!='1'))) @click="recevie(index)">确认收货</el-button>
                             <p v-if=changedbook.status==2||(changedbook.status=='1'&&(((changedbook.usernamea==username)&&(changedbook.numbera!='1'))||((changedbook.usernamea!=username)&&(changedbook.numberb!='1'))))>对方的单号为:{{changedbook.usernamea==username?changedbook.numbera:changedbook.numberb}}</p>
                     </el-col>
                     <el-col :span="4" :offset="2" style="margin-top:50px">
                         <el-steps :space="100" :active=changedbook.status finish-status="success">
-                          <el-step title="待双方同意"></el-step>
+                          <el-step title="双方已同意"></el-step>
                           <el-step title="物流"></el-step>
                           <el-step title="互评"></el-step>
                         </el-steps>
