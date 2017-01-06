@@ -125,7 +125,7 @@
 
 	<template id="second-template">
 	<transition name="fade">
-		<div>
+		<div v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="查找中,请稍等...">
 		<el-row>
 			<el-input placeholder="请输入书名或者关键字查找书评" v-model="input5" style="width: 640px;margin-left:370px">
 				<el-button slot="append" icon="search" @click="search"></el-button>
@@ -162,7 +162,7 @@
 
 	<template id="third-template">
 	<transition name="fade">
-		<div>
+		<div v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="查找中,请稍等...">
 			<p style="margin-top:-15px;margin-left:100px;font-size:20px;">站内帖子</p>
 			<p style="margin-top: -30px">______________________________________________________________________________________________________________________________________________________________________________________________________________________________</p>
 			<el-row>
@@ -481,7 +481,7 @@
 					</el-form>
 			</el-col>
 			<el-col :span="5" :offset="1">
-					<el-button type="primary" @click="upbook" style="width:300px;height:90px;margin-top:70px;font-size:40px" :disabled=!(formOfBook.introduction!=''&&formOfBook.bookname!='') >确定发布</el-button>
+					<el-button type="primary" @click="upbook" style="width:300px;height:90px;margin-top:70px;font-size:40px" :disabled=!(formOfBook.introduction!=''&&formOfBook.bookname!=''&&formOfBook.title!='') >确定发布</el-button>
 			</el-col>
 		</el-row>
 
@@ -811,6 +811,7 @@
 		data: function() {
 			return {
 				item7s: tempArticleData,
+				fullscreenLoading:false,
 				input5: '',
 			};
 		},
@@ -825,7 +826,7 @@
 					this.fullscreenLoading = false;
 					this.$message({
 						type: 'success',
-						message: '成功发送评论'
+						message: '搜索成功'
 					});
 					this.item7s = eval(result.data);
 					if (item7s.length == 0) {
@@ -969,6 +970,7 @@
 			return {
 				input5: '',
 				forums: tempForumData,
+				fullscreenLoading:false,
 			};
 		},
 		methods:{
@@ -976,8 +978,29 @@
 				app.content = 'six';
 				tempForumNumber = index;
 			},
-			search:function(){
+			search: function() {
+				this.fullscreenLoading = true;
+				this.$http.get("http://xplovesaber.top/bookEx/getForumByName.php?bookname=" + this.input5).then((result) => {
+					this.fullscreenLoading = false;
+					this.$message({
+						type: 'success',
+						message: '搜索成功'
+					});
+					this.forums = eval(result.data);
+					tempForumData=this.forums;
+					if (forums.length == 0) {
+						this.$message({
+							type: 'error',
+							message: '找不到啦!'
+						});
+					}
+				}, (error) => {
+					this.$message({
+						type: 'error',
+						message: '搜索失败!'
+					});
 
+				})
 			}
 		}
 
