@@ -63,7 +63,7 @@
 			<el-menu-item index="3">讨论区</el-menu-item>
 			<el-menu-item index="4">书籍发布</el-menu-item>
 			<el-menu-item index="5" :style={visibility:(username==null?'hidden':'visible')}>发布书评</el-menu-item>
-
+			<el-menu-item index="6" :style={visibility:(username==null?'hidden':'visible')}>发布帖子</el-menu-item>
 		</el-menu>
 		<br/>
 
@@ -490,6 +490,33 @@
 </transition>
 </template>
 
+<template id="sendForum-template">
+<transition name="fade">
+	<div v-loading.fullscreen.lock="fullscreenLoading"element-loading-text="上传书评中,请稍等...">
+		<br>
+		<br>
+		<br>
+		<el-row>
+			<el-col :span="8" :offset="4">
+					<el-form :model="formOfBook" label-position="left" label-width="90px">
+						<el-form-item label="题目">
+							<el-input v-model="formOfBook.title" style="width:220px"></el-input>
+						</el-form-item>
+						<el-form-item label="帖子内容" >
+							<el-input type="textarea" v-model="formOfBook.introduction" rows="20"></el-input>
+						</el-form-item>
+					</el-form>
+			</el-col>
+			<el-col :span="5" :offset="1">
+					<el-button type="primary" @click="upbook" style="width:300px;height:90px;margin-top:70px;font-size:40px" :disabled=!(formOfBook.introduction!=''&&formOfBook.title!='') >确定发布</el-button>
+			</el-col>
+		</el-row>
+
+	</div>
+
+</transition>
+</template>
+
 
 </body>
 <script src="/BookExchange/js/makisu.js"></script>
@@ -499,6 +526,49 @@
 	var tempArticleData, tempBookData,tempForumData;
 	var tempArticleNumber, tempBookNumber,tempForumNumber;
 	var t;
+
+	Vue.component('sendForum', {
+		template: '#sendForum-template',
+		data: function() {
+			return {
+				fullscreenLoading:false,
+				formOfBook: {
+					introduction: '',
+					title:'',
+				}
+			};
+		},
+		methods:{
+			upbook: function() {
+				this.fullscreenLoading = true;
+				var d = new FormData();
+				d.append('username', getCookie('username'));
+				var date1 = new Date(this.formOfBook.date);
+				var youWant = date1.getFullYear() + '-' + (date1.getMonth() + 1) + '-' + date1.getDate();
+				d.append('introduction', this.formOfBook.introduction);
+				d.append('date', getNowFormatDate());
+				d.append('authorpic',getCookie('userpic'));
+				d.append('title',this.formOfBook.title);
+				this.$http.post("http://xplovesaber.top/bookEx/upForum.php", d).then((response) => {
+					this.fullscreenLoading = false;
+					this.$message({
+						showClose: true,
+						message: "上传成功",
+						type: 'success'
+					});
+					app.content = 'first';
+				}, (error) => {
+					this.fullscreenLoading = false;
+					this.$message({
+						showClose: true,
+						message: "上传失败",
+						type: 'error'
+					});
+				})
+			}
+		}
+
+	})
 
 	Vue.component('sendArticle', {
 		template: '#sendArticle-template',
@@ -1258,6 +1328,8 @@
 
 				}else if(key=='5'){
 						this.content='sendArticle';
+				}else if(key=='6'){
+						this.content='sendForum';
 				}
 			}
 		}
