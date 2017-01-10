@@ -677,6 +677,7 @@
 				input4: '',
 				input5: '',
 				select: '',
+				fullscreenLoading:false,
 				banners: [{
 					src: "http://xplovesaber.top/bookEx/img/banner1.jpg"
 				}, {
@@ -933,9 +934,7 @@
 					cancelButtonText: '取消',
 					//inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
 					//inputErrorMessage: '邮箱格式不正确'
-				}).then(({
-					value
-				}) => {
+				}).then(({value}) => {
 					var temptime = getNowFormatDate();
 					this.$http.get("http://xplovesaber.top/bookEx/addComment.php?username=" + getCookie('username') + "&&comment=" + value + "&&articleid=" + tempArticleData[tempArticleNumber]['id'] + "&&time=" + temptime).then((result) => {
 						this.$message({
@@ -989,9 +988,7 @@
    					cancelButtonText: '取消',
    					//inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
    					//inputErrorMessage: '邮箱格式不正确'
-   				}).then(({
-   					value
-   				}) => {
+   				}).then(({value}) => {
    					var temptime = getNowFormatDate();
    					this.$http.get("http://xplovesaber.top/bookEx/addForumComment.php?username=" + getCookie('username') + "&&comment=" + value + "&&articleid=" + tempForumData[tempForumNumber]['id'] + "&&time=" + temptime).then((result) => {
    						this.$message({
