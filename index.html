@@ -125,7 +125,7 @@
 
 	<template id="second-template">
 	<transition name="fade">
-		<div v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="查找中,请稍等...">
+		<div v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="请稍等,马上就好...">
 		<el-row>
 			<el-input placeholder="请输入书名或者关键字查找书评" v-model="input5" style="width: 640px;margin-left:370px">
 				<el-button slot="append" icon="search" @click="search"></el-button>
@@ -208,18 +208,18 @@
 				<el-col :span="6" :offset="1">
 					<form id="uploadForm"  method="post" enctype="multipart/form-data">
 						<label for="file">图书照片:</label>
-						<input type="file" name="file" id="file" onchange="javascript:setImagePreview();" :value="pic">
+						<input type="file" name="file" id="file" onchange="javascript:setImagePreview();">
 						<div id="localImag"><img id="preview" width=-1 height=-1 style="diplay:none" /></div>
 						<br>
 					</form>
 				</el-col>
 				<el-col :span="8" :offset="1">
-						<el-form :model="formOfBook" label-position="left" label-width="90px">
+						<el-form :model="formOfBook" label-position="left" label-width="90px" >
 							<el-form-item label="书名">
 								<el-input v-model="formOfBook.bookname" style="width:220px"></el-input>
 							</el-form-item>
 							<el-form-item label="购买日期">
-									<el-date-picker style="width:220px" v-model="formOfBook.date" type="date" placeholder="选择日期" :picker-options="pickerOptions0">
+									<el-date-picker style="width:220px" v-model="formOfBook.date" type="date" placeholder="选择日期" >
 									</el-date-picker>
 							</el-form-item>
 							<el-form-item label="书籍类型">
@@ -888,8 +888,17 @@
 		},
 		methods: {
 			toArticle: function(index) {
-				app.content = 'five';
-				tempArticleNumber = index;
+				this.fullscreenLoading=true;
+				this.$http.get('http://xplovesaber.top/bookEx/getArticleContent.php?id=' + tempArticleData[index]['id']).then((result) => {
+					tempArticleData[index]['introduction'] = eval(result.data)[0]['content'];
+					this.fullscreenLoading=false;
+					app.content = 'five';
+					tempArticleNumber = index;
+
+				}, (error) => {
+
+				});
+
 			},
 			search: function() {
 				this.fullscreenLoading = true;
@@ -967,7 +976,8 @@
 				this.comments = eval(result.data).reverse();
 			}, (error) => {
 
-			})
+			});
+
 		}
 
 	})
@@ -1076,7 +1086,6 @@
 		template: '#four-template',
 		data: function() {
 			return {
-				pic:'',
 				fullscreenLoading: false,
 				fileList: [],
 				options: [{
@@ -1155,6 +1164,7 @@
 						type: 'success'
 					});
 					app.content = 'first';
+					window.alert(response.data);
 				}, (error) => {
 					this.fullscreenLoading = false;
 					this.$message({
